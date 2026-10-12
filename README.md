@@ -2,7 +2,7 @@
 
 An interactive, self-paced tutorial on using AI tools within a sound legal research process: framing the question, choosing the right source, retrieving authority, evaluating answers, and verifying the law.
 
-**Live site:** https://Eli-UCLALaw.github.io/legal-research-ai-tutorial/
+**Live site:** https://eli-uclalaw.github.io/legal-research-ai-tutorial/
 
 ## What's inside
 
@@ -19,4 +19,4 @@ The whole tutorial is a single file, `index.html`, with no build step or depende
 
 ## Author
 
-Eli Edwards, UCLA School of Law, Hugh and Hazel Darling Law Library
+Eli Edwards, Hugh and Hazel Darling Law Library, UCLA School of Law

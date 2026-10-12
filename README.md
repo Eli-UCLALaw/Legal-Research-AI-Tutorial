@@ -2,7 +2,7 @@
 
 An interactive, self-paced tutorial on using AI tools within a sound legal research process: framing the question, choosing the right source, retrieving authority, evaluating answers, and verifying the law.
 
-**Live site:** https://eli-uclalaw.github.io/legal-research-ai-tutorial/
+**Live site:** https://eli-uclalaw.github.io/Legal-Research-AI-Tutorial/
 
 ## What's inside
 

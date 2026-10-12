@@ -19,4 +19,4 @@ The whole tutorial is a single file, `index.html`, with no build step or depende
 
 ## Author
 
-Edwards, UCLA School of Law
+Eli Edwards, UCLA School of Law, Hugh and Hazel Darling Law Library

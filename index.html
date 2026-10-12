@@ -1,0 +1,1027 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>  <title>Prompting AI for Legal Research</title>
+<meta name="description" content="An interactive tutorial on prompting AI tools for sound legal research.">
+</head><body>
+<style>
+:root{
+  --bg:#f6f5f1; --surface:#ffffff; --surface2:#fbfaf7; --ink:#1c2230; --muted:#5a6374; --line:#dcd8ce;
+  --accent:#1f4e8c; --accent-ink:#ffffff; --accent-soft:#e7eef8;
+  --good:#1d7243; --good-soft:#e4f3ea; --warn:#9a5700; --warn-soft:#fcf0da; --bad:#b0271f; --bad-soft:#fbe7e4;
+  --code:#f0eee7; --shadow:0 1px 2px rgba(0,0,0,.05),0 2px 10px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --surface:#1c2028; --surface2:#20252e; --ink:#e7e9ee; --muted:#a3abba; --line:#343a46;
+    --accent:#7fb0f0; --accent-ink:#0e1420; --accent-soft:#1f2c40;
+    --good:#6fd39a; --good-soft:#15301f; --warn:#f0b35a; --warn-soft:#352812; --bad:#ff8c80; --bad-soft:#3a1a18;
+    --code:#252a33; --shadow:none;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#14171d; --surface:#1c2028; --surface2:#20252e; --ink:#e7e9ee; --muted:#a3abba; --line:#343a46;
+    --accent:#7fb0f0; --accent-ink:#0e1420; --accent-soft:#1f2c40;
+    --good:#6fd39a; --good-soft:#15301f; --warn:#f0b35a; --warn-soft:#352812; --bad:#ff8c80; --bad-soft:#3a1a18;
+    --code:#252a33; --shadow:none;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;line-height:1.25;font-weight:600}
+h2{font-size:1.75rem;margin:.2rem 0 1rem}
+h3{font-size:1.25rem;margin:2rem 0 .6rem}
+h4{font-size:1.05rem;margin:1.2rem 0 .4rem}
+a{color:var(--accent)}
+p{margin:.6rem 0}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:10px 20px}
+.top h1{font-size:1.1rem;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.bar{width:140px;height:8px;background:var(--code);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.layout{display:flex;max-width:1200px;margin:0 auto}
+nav{width:270px;flex:none;padding:20px 12px;position:sticky;top:calc(53px + env(safe-area-inset-top,0px));align-self:flex-start;max-height:calc(100vh - 53px);overflow:auto}
+nav button{display:flex;width:100%;text-align:left;gap:10px;align-items:baseline;background:none;border:0;color:var(--ink);padding:8px 10px;border-radius:8px;font:inherit;font-size:.93rem;cursor:pointer}
+nav button:hover{background:var(--accent-soft)}
+nav button.active{background:var(--accent);color:var(--accent-ink)}
+nav .n{font-variant-numeric:tabular-nums;opacity:.7;width:1.4em;flex:none}
+nav .t{flex:1}
+nav .c{font-size:.75rem;opacity:.75;white-space:nowrap}
+main{flex:1;min-width:0;padding:24px 28px 80px}
+section.mod{display:none;max-width:780px}
+section.mod.show{display:block}
+.lead{font-size:1.08rem;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:16px 0;box-shadow:var(--shadow)}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.prompt{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88rem;white-space:pre-wrap;word-wrap:break-word}
+.prompt.weak{border-left:4px solid var(--bad)}
+.prompt.better{border-left:4px solid var(--good)}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-right:6px}
+.tag.weak{background:var(--bad-soft);color:var(--bad)} .tag.better{background:var(--good-soft);color:var(--good)}
+.tablewrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface2);font-weight:600}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:22px 0;box-shadow:var(--shadow)}
+.ex-h{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.ex-h .done{margin-left:auto;color:var(--good);display:none}
+.ex.is-done .ex-h .done{display:inline}
+.ex .q{font-weight:600;margin:0 0 10px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0;font:inherit;color:var(--ink);cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:.94rem;display:none}
+.fb.show{display:block}
+.fb.good{background:var(--good-soft);border:1px solid var(--good)}
+.fb.bad{background:var(--bad-soft);border:1px solid var(--bad)}
+.fb.neutral{background:var(--surface2);border:1px solid var(--line)}
+label.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0;background:var(--surface2);cursor:pointer}
+label.chk input{margin-top:5px}
+label.chk.right{border-color:var(--good);background:var(--good-soft)}
+label.chk.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.itemfb{font-size:.88rem;color:var(--muted);margin-top:4px;display:none}
+.checked .itemfb{display:block}
+.mrow{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0;background:var(--surface2)}
+.mrow.right{border-color:var(--good);background:var(--good-soft)}
+.mrow.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.mrow .it{margin-bottom:6px}
+select,textarea,input[type=text]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+select{width:100%}
+textarea{width:100%;min-height:140px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem;resize:vertical}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{font:inherit;font-size:.92rem;font-weight:600;border-radius:8px;padding:8px 14px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.sec{background:transparent;color:var(--accent)}
+.btn:hover{filter:brightness(1.07)}
+.result{margin-top:14px;display:none}
+.result.show{display:block}
+.rating{font-weight:700;padding:8px 12px;border-radius:8px;margin-bottom:8px}
+.rating.good{background:var(--good-soft);color:var(--good)} .rating.mid{background:var(--warn-soft);color:var(--warn)} .rating.low{background:var(--bad-soft);color:var(--bad)}
+ul.rub{list-style:none;padding:0;margin:6px 0}
+ul.rub li{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.93rem}
+ul.rub li:last-child{border-bottom:0}
+ul.rub .ic{flex:none;width:1.4em;font-weight:700;text-align:center}
+.ic.ok{color:var(--good)} .ic.no{color:var(--bad)} .ic.w{color:var(--warn)} .ic.tip{color:var(--accent)}
+.small{font-size:.85rem;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.tabs button{font:inherit;font-size:.88rem;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tabs button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tabpanel{display:none}
+.tabpanel.on{display:block}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:36px;border-top:1px solid var(--line);padding-top:18px}
+.sim{border:1px dashed var(--line);border-radius:10px;padding:14px 16px;background:var(--surface2);font-size:.93rem}
+.sim .lk{color:var(--accent);text-decoration:underline}
+.sim .nolk{background:var(--warn-soft);padding:0 3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fwhint{font-size:.9rem;background:var(--accent-soft);border-radius:8px;padding:8px 12px;margin:8px 0}
+ol li,ul li{margin:.25rem 0}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:calc(40px + env(safe-area-inset-top,0px)) 16px 16px;overflow:auto}
+.panel>div{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;max-width:760px;width:100%;padding:20px}
+.panel textarea{min-height:320px}
+.inline-confirm{margin-top:8px;font-size:.9rem;padding:8px 12px;border-radius:8px;background:var(--warn-soft);border:1px solid var(--warn)}
+@media (max-width:860px){
+  .layout{display:block}
+  nav{position:static;width:auto;max-height:none;display:flex;overflow-x:auto;gap:4px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  nav button{width:auto;flex:none;white-space:nowrap}
+  nav .c{display:none}
+  main{padding:18px 16px 60px}
+  .bar{width:60px} #progtxt{display:none}
+  .grid2{grid-template-columns:1fr}
+  .top{padding:10px 16px}
+}
+@media print{
+  nav,.top,.pager,.btns{display:none!important}
+  section.mod{display:block!important}
+}
+</style>
+<header class="top">
+  <h1>Prompting AI for Legal Research</h1>
+  <div class="prog"><span id="progtxt">0 / 0</span><div class="bar"><i id="progbar"></i></div></div>
+  <button class="btn sec" id="dlbtn" title="See and copy the prompts you wrote">My work</button>
+</header>
+<div class="layout">
+  <nav id="nav" aria-label="Lessons"></nav>
+  <main id="main"></main>
+</div>
+<div class="panel" id="workpanel" hidden><div role="dialog" aria-modal="true" aria-labelledby="wph"><h3 id="wph" style="margin-top:0">My work</h3><p class="small">Everything you wrote in this session. Copy it into a document or email if you want to keep it or hand it in. Nothing is saved when you leave the page.</p><textarea id="worktext" readonly></textarea><div class="btns"><button class="btn" id="workcopy">Copy all</button><button class="btn sec" id="workclose">Close</button></div></div></div>
+
+<script>
+/* =========================================================
+   CONTENT
+   ========================================================= */
+const MODULES = [
+{ id:'intro', title:'Welcome & the research loop', html:`
+<h2>Welcome</h2>
+<p class="lead">This tutorial shows you how to use AI in a sound legal research process. You'll frame the question, choose the right source, retrieve authority, evaluate the answer, and verify the law.</p>
+<div class="callout"><strong>Ground rule.</strong> A strong prompt helps a tool understand the assignment. It does not make the answer authoritative. Treat AI output as a research aid until you have read the underlying sources and confirmed that the law is current.</div>
+<div class="card">
+<h4 style="margin-top:0">How this tutorial works</h4>
+<ul>
+<li>Work through the lessons in order or jump around using the menu.</li>
+<li>Exercises give instant feedback. You can retry any of them.</li>
+<li>Writing exercises use <em>automated pattern feedback</em>. It checks whether your prompt includes the features of a strong prompt, but it can't judge legal accuracy. Compare your draft with the model answer.</li>
+<li><strong>Nothing you type is saved or sent anywhere.</strong> Reloading the page clears your work. Use <em>My work</em> (top right) to see and copy everything you wrote.</li>
+<li>Case names in simulated AI responses are <strong>fictional</strong> and exist only for training.</li>
+</ul>
+</div>
+<h3>Prompting is one step in a six-stage research loop</h3>
+<div class="tablewrap"><table>
+<tr><th>Stage</th><th>Student action</th><th>AI can help with</th><th>Student must verify</th></tr>
+<tr><td><strong>1. Frame</strong></td><td>Identify jurisdiction, facts, posture, and research question.</td><td>Issue spotting; clarifying questions.</td><td>That the question is legally and factually accurate.</td></tr>
+<tr><td><strong>2. Plan</strong></td><td>Choose sources and search strategy.</td><td>Terms of art; synonyms; source suggestions.</td><td>Appropriate databases, authority hierarchy, and research scope.</td></tr>
+<tr><td><strong>3. Retrieve</strong></td><td>Locate potentially relevant authority.</td><td>AI-assisted search in legal databases.</td><td>Existence, relevance, jurisdiction, and source type.</td></tr>
+<tr><td><strong>4. Read</strong></td><td>Read the authorities.</td><td>Summaries, comparisons, extraction.</td><td>Holding, rule, reasoning, quotations, posture, and facts.</td></tr>
+<tr><td><strong>5. Update &amp; synthesize</strong></td><td>Update authorities and reconcile them.</td><td>Charts; rule synthesis; counterarguments.</td><td>Treatment, current validity, conflicts, and omitted authority.</td></tr>
+<tr><td><strong>6. Communicate</strong></td><td>Draft the research answer.</td><td>Outline, memo, explanation, editing.</td><td>Every material proposition and citation in the final work.</td></tr>
+</table></div>
+<div class="callout"><strong>Classroom rule:</strong> AI may suggest the path. Primary and authoritative sources establish the law.</div>
+<div data-ex="loop"></div>
+`},
+{ id:'task', title:'Start with the task', html:`
+<h2>Start with the research task, not the AI tool</h2>
+<p class="lead">Before you prompt, decide what you are trying to accomplish. The prompt should fit the task.</p>
+<div class="tablewrap"><table>
+<tr><th>Task</th><th>What it means</th></tr>
+<tr><td><strong>Issue spotting</strong></td><td>Identify possible claims, defenses, elements, or legal questions.</td></tr>
+<tr><td><strong>Research planning</strong></td><td>Generate terminology, synonyms, sources, and a search sequence.</td></tr>
+<tr><td><strong>Authority research</strong></td><td>Locate cases, statutes, regulations, rules, and secondary sources.</td></tr>
+<tr><td><strong>Source analysis</strong></td><td>Summarize, compare, or extract rules from materials you provide or retrieve.</td></tr>
+<tr><td><strong>Synthesis</strong></td><td>Organize authorities, distinguish cases, identify conflicts, and explain how rules fit together.</td></tr>
+<tr><td><strong>Drafting</strong></td><td>Turn verified research into an outline, memo, chart, email, or other work product.</td></tr>
+</table></div>
+<p>A brainstorming prompt written for a general AI assistant shouldn't be copied unchanged into a legal research database. A one-sentence database query usually isn't enough for a complex drafting agent.</p>
+<div data-ex="tasks"></div>
+`},
+{ id:'frameworks', title:'Two general frameworks', html:`
+<h2>Two general prompting frameworks</h2>
+<p class="lead">Most prompting advice reduces to two patterns. Use Framework A for ordinary chat, analysis, and document tasks. Use Framework B when the tool will carry out a longer or more autonomous assignment.</p>
+<h3>Framework A: Task + Context + Constraints + Output</h3>
+<p>Use this for general-purpose AI such as ChatGPT, Claude, Gemini, or Copilot, and for many legal drafting or document-analysis tasks.</p>
+<div class="tablewrap"><table>
+<tr><th>Component</th><th>Ask yourself</th><th>Legal-research example</th></tr>
+<tr><td><strong>Task</strong></td><td>What should the AI do?</td><td>Identify the elements of a claim and generate research terms.</td></tr>
+<tr><td><strong>Context</strong></td><td>What facts, documents, audience, or purpose matter?</td><td>California state-court dispute; tenant withheld rent after six weeks without heat.</td></tr>
+<tr><td><strong>Constraints</strong></td><td>What boundaries must the answer respect?</td><td>Do not invent or cite cases; distinguish statutes from inferences; use only the uploaded materials.</td></tr>
+<tr><td><strong>Output</strong></td><td>What form should the answer take?</td><td>Table with Issue, Rule to Research, and Search Terms.</td></tr>
+</table></div>
+<div class="prompt better"><span class="tag better">Example</span>
+Task: Identify the legal issues and possible claims or defenses raised by these facts.
+Context: A California residential tenant withheld rent after the landlord failed to repair a broken heater for six weeks.
+Constraints: Do not cite cases. I will locate authority in a legal database. Flag any factual questions that could change the analysis.
+Output: A table with columns Issue | What must be researched | Suggested search terms.</div>
+<p><strong>Why it works:</strong> Guidance from the major model providers consistently stresses a clear task, relevant context, explicit constraints, and a stated response format. For complex prompts, headings or delimiters help separate instructions from source text.</p>
+<div data-ex="fwA"></div>
+
+<h3>Framework B: Goal + Scope + Definition of Done + Checkpoints</h3>
+<p>Use this when the AI will reason across many sources, conduct deep research, or act as an agent.</p>
+<div class="tablewrap"><table>
+<tr><th>Component</th><th>What to specify</th></tr>
+<tr><td><strong>Goal</strong></td><td>The legal question or work product you ultimately need.</td></tr>
+<tr><td><strong>Scope</strong></td><td>Jurisdiction, court level, date range, source types, materials to use, and what is out of scope.</td></tr>
+<tr><td><strong>Definition of done</strong></td><td>What a complete answer must contain.</td></tr>
+<tr><td><strong>Checkpoints</strong></td><td>Places where the tool should pause, ask, show a plan, or identify uncertainty before proceeding.</td></tr>
+</table></div>
+<div class="prompt better"><span class="tag better">Example</span>
+Goal: Prepare a research memo on whether an Oregon online retailer is subject to specific personal jurisdiction in Illinois federal court.
+Scope: U.S. Supreme Court and Seventh Circuit authority, plus N.D. Ill. decisions since 2021; focus on internet-sales contacts and relatedness.
+Definition of done: State the governing test, identify the strongest authorities on both sides, and list unresolved factual or legal questions.
+Checkpoint: Before drafting the memo, show the research plan and identify any assumptions that could materially change the result.</div>
+<div data-ex="fwB"></div>
+<div class="callout"><strong>Don't ask for hidden chain-of-thought.</strong> Reasoning-capable systems generally don't need "think step by step." Instead, ask for the <em>analysis structure you need to review</em>: rule, application, counterarguments, citations, and unresolved questions, each set out separately.</div>
+<div data-ex="fwChoice"></div>
+<div data-ex="cot"></div>
+`},
+{ id:'legalai', title:'Prompting legal research AI', html:`
+<h2>A generic framework for legal AI research products</h2>
+<p class="lead">If you're using a legal research AI and don't have product-specific guidance, use this compact formula.</p>
+<div class="card">
+<h4 style="margin-top:0">Jurisdiction + Material Facts + One Legal Question + Source Scope + Verification</h4>
+<ol>
+<li><strong>Jurisdiction:</strong> Name the governing jurisdiction and, when relevant, the court level.</li>
+<li><strong>Material facts and posture:</strong> Include only facts that affect the legal question, plus procedural posture when it matters.</li>
+<li><strong>One legal question:</strong> Ask one discrete issue at a time when possible.</li>
+<li><strong>Source scope:</strong> State any limits on authority: binding cases only, primary law, a date range, a statute, a regulation, or specific documents.</li>
+<li><strong>Verification request:</strong> Ask for citations or links to the supporting authority, and ask the tool to identify uncertainty or gaps.</li>
+</ol></div>
+<div class="prompt better"><span class="tag better">Example</span>Under California law, may an employer enforce a customer non-solicitation clause against a former employee? The employee signed the agreement in 2023 and now works for a competitor. Focus on California Supreme Court and Courts of Appeal authority and the current text of Business and Professions Code § 16600. Provide linked citations to the authorities supporting each material proposition and flag any unresolved issue.</div>
+<h3>Why this differs from a general chat prompt</h3>
+<p>Purpose-built legal research tools often already know you want legal authority, and they may already control the answer format. Long personas, elaborate tone instructions, and multiple unrelated questions add noise. Precise jurisdiction, legally material facts, and a focused issue usually matter more.</p>
+<div data-ex="diag"></div>
+<div data-ex="rwLegal"></div>
+`},
+{ id:'tools', title:'Tool-specific patterns', html:`
+<h2>Tool-specific prompting patterns</h2>
+<p class="lead">Each major platform recommends a slightly different pattern. Pick a tool below.</p>
+<div class="callout warn">Product interfaces change quickly. When a feature, source collection, or limit matters, check the current in-product help.</div>
+<div class="tabs" id="tooltabs">
+<button data-t="tw" class="on">Westlaw / CoCounsel</button><button data-t="tl">Lexis+ AI Protégé</button><button data-t="tb">Bloomberg Law</button><button data-t="th">Harvey</button><button data-t="tg">Legora</button>
+</div>
+<div class="tabpanel on" id="tw">
+<h3>Westlaw / CoCounsel Legal / Westlaw Deep Research</h3>
+<p><strong>Official Thomson Reuters framework: Intent + Context + Instruction.</strong></p>
+<ul><li><strong>Intent:</strong> Why you need the result.</li><li><strong>Context:</strong> Relevant facts, case type, governing law, posture, or documents.</li><li><strong>Instruction:</strong> What the tool should do and, when useful, how to present the result.</li></ul>
+<p>For Westlaw Deep Research and AI-Assisted Research, Thomson Reuters recommends <strong>clear, focused prompts of about one or two sentences</strong> in everyday language, not Boolean syntax. Include only material facts and focus on a single issue. Leave out proper names that aren't legally relevant, because they can distort retrieval.</p>
+<div class="prompt better"><span class="tag better">Example</span>Under Texas law, does a party waive attorney-client privilege by disclosing privileged information to a transaction counterparty during due diligence when the parties have a nondisclosure agreement?</div>
+<p><strong>Teaching note:</strong> CoCounsel Legal also supports broader plain-language requests that combine research, analysis, and drafting. For a multi-step assignment, use Goal + Scope + Definition of Done + Checkpoints instead of forcing everything into a one-sentence query.</p>
+<p><strong>Verify:</strong> Open the linked primary authority, confirm the proposition and procedural posture, and run KeyCite or another appropriate citator before relying on the result.</p>
+</div>
+<div class="tabpanel" id="tl">
+<h3>Lexis+ AI with Protégé</h3>
+<p><strong>Official LexisNexis framework: the 5 P's.</strong></p>
+<div class="tablewrap"><table>
+<tr><th>P</th><th>Meaning in the LexisNexis guide</th></tr>
+<tr><td><strong>Prime</strong></td><td>Gather the context, background, and constraints, including jurisdiction and key facts.</td></tr>
+<tr><td><strong>Persona</strong></td><td>Define the relevant perspective, such as the client or addressee.</td></tr>
+<tr><td><strong>Product</strong></td><td>Specify the desired output, such as format or length.</td></tr>
+<tr><td><strong>Prompt</strong></td><td>Write clear, specific instructions using the relevant information above.</td></tr>
+<tr><td><strong>Polish</strong></td><td>Refine the result conversationally through follow-up instructions.</td></tr>
+</table></div>
+<p>LexisNexis emphasizes specificity, context, jurisdiction, material facts, format, and audience, followed by iterative refinement. Don't try to perfect an oversized first prompt.</p>
+<div class="prompt better"><span class="tag better">Example</span>Under the Bankruptcy Code, are restitution claims dischargeable in a Chapter 11 case involving a corporate debtor? Focus on Ninth Circuit authority. Summarize the rule and provide linked supporting authority.</div>
+<div class="callout"><strong>Product cue:</strong> According to LexisNexis, an <strong>unlinked citation in a Protégé response</strong> means the source could not be verified in the LexisNexis database. Treat it as unverified and locate the authority independently.</div>
+</div>
+<div class="tabpanel" id="tb">
+<h3>Bloomberg Law Answers and AI Assistant</h3>
+<p>Bloomberg Law doesn't publish a named prompting acronym in the public guidance reviewed for this tutorial. Use this pattern: <strong>Focused Question → Jurisdiction → Follow-up → Verify.</strong></p>
+<ul>
+<li>Ask a focused legal question in natural language.</li>
+<li>Use jurisdiction-specific filtering when available instead of embedding unnecessary geographic detail.</li>
+<li>Use the AI Assistant for iterative research, source questions, summaries, and comparisons.</li>
+<li>For multi-jurisdiction work, use the comparison/chart functionality when it fits.</li>
+<li>Use inline citations and one-click links to inspect the source behind the answer.</li>
+</ul>
+<p>Bloomberg says Answers and AI Assistant are grounded in Bloomberg Law content and may abstain when the platform lacks supporting content or the request falls outside legal scope. That reduces some risks, but you still need to read and validate the authority.</p>
+<div class="prompt better"><span class="tag better">Example</span>What test does the Ninth Circuit apply to determine whether an online platform has purposefully directed conduct at the forum state in a trademark case?</div>
+<p>Then narrow with a follow-up:</p>
+<div class="prompt better"><span class="tag better">Follow-up</span>Limit the answer to published Ninth Circuit decisions from 2020 forward and compare the cases by the online conduct the court found sufficient or insufficient.</div>
+</div>
+<div class="tabpanel" id="th">
+<h3>Harvey</h3>
+<p>For routine prompts, Harvey's help center recommends <strong>Request + Context + Output.</strong></p>
+<ul><li><strong>Request:</strong> State the legal task clearly.</li><li><strong>Context:</strong> Identify the relevant documents, matter background, audience, jurisdiction, and issues.</li><li><strong>Output:</strong> Specify the form and style of the response.</li></ul>
+<p>Harvey also publishes the <strong>CLAIM</strong> framework (Context, Legal task, Audience, Instructions, Mode of output) for broader legal work. Treat CLAIM as the expanded version of Request + Context + Output, not a separate framework to memorize.</p>
+<div class="prompt better"><span class="tag better">Example</span>Request: Compare the assignment clauses in the three uploaded agreements.
+Context: We represent the buyer in a California asset acquisition and need to identify any consent requirements that could delay closing.
+Output: Create a table with Agreement | Consent required? | Triggering language | Relevant quotation | Follow-up question. Enter "Not found" when the document does not address the issue.</div>
+<p><strong>Tips:</strong> Ground prompts in uploaded sources. Refer to document names or sections rather than page numbers. Name jurisdictions explicitly. Break complex requests into focused stages. Use words such as "brief," "concise," "detailed," or "thorough" rather than a fixed page count.</p>
+</div>
+<div class="tabpanel" id="tg">
+<h3>Legora</h3>
+<p>Legora combines legal research, document review, workflows, and an agent that can plan and carry out multi-step legal work. Its public materials don't name a single prompting acronym, so match your pattern to the mode: <strong>Source + Goal + Deliverable + Review Point.</strong></p>
+<ul><li><strong>Source:</strong> Select or identify the research source or documents the answer should use.</li><li><strong>Goal:</strong> State the legal question or work objective.</li><li><strong>Deliverable:</strong> Specify the memo, table, comparison, draft, or extraction you need.</li><li><strong>Review point:</strong> For agentic tasks, review the proposed plan and other judgment points before accepting the final work product.</li></ul>
+<p>In <strong>Tabular Review</strong>, each prompt works like a column question. Ask one extractable question per column and specify the answer format.</p>
+<div class="prompt better"><span class="tag better">Column</span>Does this agreement contain a change-of-control provision? Answer Yes or No and quote the operative language.</div>
+<div class="prompt better"><span class="tag better">Column</span>What notice period applies to termination for convenience? Return the number of days and quote the clause. If not found, return "Not found."</div>
+<p>For the <strong>Agent</strong>, give the objective and boundaries. Then review the plan and the final sources rather than prescribing every intermediate action.</p>
+</div>
+<div data-ex="toolFw"></div>
+<div data-ex="toolFit"></div>
+<div data-ex="westlawBool"></div>
+<div data-ex="protege"></div>
+<div data-ex="harveyPages"></div>
+<div data-ex="bloombergAbstain"></div>
+<div data-ex="rwWestlaw"></div>
+`},
+{ id:'general', title:'General AI & documents', html:`
+<h2>What general-purpose AI is good for</h2>
+<p class="lead">General-purpose AI can help before, during, and after database research.</p>
+<ul>
+<li>Brainstorming possible issues, elements, defenses, and factual questions</li>
+<li>Generating synonyms, terms of art, and natural-language or Boolean search ideas</li>
+<li>Explaining unfamiliar doctrine as an orientation step</li>
+<li>Summarizing or comparing documents that you provide</li>
+<li>Turning verified research into an outline, chart, or draft</li>
+<li>Stress-testing an argument by identifying counterarguments or missing facts</li>
+</ul>
+<div class="callout warn">Don't treat a case name, quotation, citation, statute, or statement of current law from a general-purpose model as verified just because the answer sounds confident. Even if the model has web access or connectors, you still need to inspect the underlying authority and confirm it is still good law.</div>
+<h3>Better than "show your reasoning"</h3>
+<p>Ask for an auditable structure instead:</p>
+<div class="prompt better">State the rule you are applying, identify the source for the rule, apply it to the facts, identify the strongest counterargument, and list any factual or legal issue that still requires research.</div>
+<p>That gives you something you can evaluate, without asking the model to reveal hidden internal reasoning.</p>
+<div data-ex="genUses"></div>
+<div data-ex="genCite"></div>
+<h2 style="margin-top:2.5rem">Prompting with documents and long source material</h2>
+<p>When the task depends on documents you provide:</p>
+<ul>
+<li>Identify which documents the model should use and what each is for.</li>
+<li>Separate source text from instructions with headings, labels, or delimiters.</li>
+<li>For long inputs, place the source material before the final question when the product supports that workflow.</li>
+<li>Ask for quotations or pinpoint references when you need to trace a statement back to the source.</li>
+<li>Tell the model what to do when the source is silent. For example: "If the document does not answer the question, say 'Not found' rather than inferring."</li>
+<li>When comparing many documents, define the categories before asking for a table.</li>
+</ul>
+<p>Document-grounded exercises are useful for learning because you can compare the AI's summary to the actual text and practice spotting omissions, overstatement, and unsupported inference.</p>
+<div data-ex="rwDocs"></div>
+`},
+{ id:'failures', title:'Common prompting failures', html:`
+<h2>Common prompting failures</h2>
+<h3>False premise</h3>
+<div class="prompt weak"><span class="tag weak">Weak</span>Why did the court hold that the clause was unenforceable?</div>
+<p>This assumes the holding. A model may accept the premise instead of correcting it.</p>
+<div class="prompt better"><span class="tag better">Better</span>What did the court hold about the enforceability of the clause? Quote or cite the portion of the opinion that states the holding.</div>
+<h3>Too many issues at once</h3>
+<div class="prompt weak"><span class="tag weak">Weak</span>Research personal jurisdiction, venue, removal, statute of limitations, and damages and tell me whether we will win.</div>
+<p><strong>Better:</strong> Break the assignment into separate research questions, or give an agent a scoped research brief with a definition of done.</p>
+<h3>Irrelevant facts</h3>
+<p>Facts that don't change the legal issue can skew retrieval. Include a fact because it affects doctrine, posture, remedy, authority, or terminology, not just because it's part of the story.</p>
+<h3>Vague source request</h3>
+<div class="prompt weak"><span class="tag weak">Weak</span>Give me the law.</div>
+<div class="prompt better"><span class="tag better">Better</span>Identify controlling Ninth Circuit and U.S. Supreme Court authority. If no controlling authority resolves the issue, identify persuasive federal authority and label it as persuasive.</div>
+<h3>Overreliance on model "confidence"</h3>
+<p>A confidence label is not a citator, and it isn't evidence that a proposition is correct. Prefer source-backed explanations, explicit uncertainty, and independent verification.</p>
+<div data-ex="failMatch"></div>
+<div data-ex="rwPremise"></div>
+<div data-ex="rwMany"></div>
+`},
+{ id:'verify', title:'Verification', html:`
+<h2>Verification: the step no prompt can replace</h2>
+<p class="lead">A 2024 Stanford RegLab study evaluated then-current versions of Lexis+ AI, Westlaw AI-Assisted Research, and Ask Practical Law AI. It found hallucinations in roughly <strong>17% to 33% of responses</strong>, depending on the system and task.</p>
+<p>The study predates many current product versions, so don't treat those percentages as present-day performance estimates. The lasting lesson is that retrieval grounding lowers the risk of hallucination but doesn't eliminate it.</p>
+<h3>Verification loop</h3>
+<p>For every material legal proposition produced by AI:</p>
+<ol>
+<li><strong>Open the source.</strong> Confirm that the cited case, statute, regulation, or rule exists.</li>
+<li><strong>Read the relevant language.</strong> Make sure the source actually supports the proposition and that quotations are accurate.</li>
+<li><strong>Check authority.</strong> Is it controlling, persuasive, or secondary? Are the court level and jurisdiction correct?</li>
+<li><strong>Update the law.</strong> Use KeyCite, Shepard's, BCite, or another appropriate citator. Check the current version of statutes, regulations, and rules.</li>
+<li><strong>Check context.</strong> Confirm procedural posture, factual similarity, exceptions, and later developments.</li>
+<li><strong>Search for what is missing.</strong> A plausible answer can omit adverse or controlling authority.</li>
+<li><strong>Record the verified sources.</strong> Your research trail should survive even if the AI chat does not.</li>
+</ol>
+<div data-ex="stanford"></div>
+<h3>Practice: audit a simulated AI response</h3>
+<p>A student asked a legal research AI the § 16600 non-solicitation question from Lesson 4. Below is a <strong>simulated</strong> response. <em>All case names are fictional.</em> Underlined text marks a linked citation; <span class="nolk" style="background:var(--warn-soft)">highlighted text</span> marks an unlinked one.</p>
+<div class="sim">
+<p><strong>[A]</strong> Business and Professions Code <span class="lk">§ 16600</span> voids contracts that restrain anyone from engaging in a lawful profession, trade, or business, subject to statutory exceptions. <em>(The response quotes statutory text retrieved from an older database snapshot.)</em></p>
+<p><strong>[B]</strong> In <span class="lk"><em>Harlow v. Brightline Staffing</em> (Cal. Ct. App. 2023, unpublished)</span>, the court held that customer non-solicitation clauses are void.</p>
+<p><strong>[C]</strong> <em>See also</em> <span class="nolk"><em>Mercer v. Tidewater Analytics</em>, 17 Cal.5th 402 (2024)</span>.</p>
+<p><strong>[D]</strong> The <em>Harlow</em> court stated that "every non-solicitation clause is per se invalid in all circumstances." <span class="lk">[link]</span></p>
+<p><strong>[E]</strong> In <span class="lk"><em>Dalton v. Orchard Systems</em></span>, the court enjoined a former employee from soliciting customers. <em>(The ruling was a preliminary injunction based on the employee's misuse of trade secrets.)</em></p>
+<p><strong>[F]</strong> No California authority permits enforcement of any customer non-solicitation provision.</p>
+<p><strong>Confidence: High</strong></p>
+</div>
+<div data-ex="simResp"></div>
+<div data-ex="confidence"></div>
+<div data-ex="record"></div>
+`},
+{ id:'ethics', title:'Confidentiality & ethics', html:`
+<h2>Confidentiality, ethics, and institutional rules</h2>
+<p class="lead">Before you enter nonpublic information into an AI system, follow the rules of your school, clinic, employer, court, and database provider.</p>
+<p><strong>ABA Formal Opinion 512 (2024)</strong> addresses lawyers' duties when using generative AI, including competence, confidentiality, communication, supervision, candor, meritorious claims, and reasonable fees. It is guidance interpreting the ABA Model Rules, not binding law in itself. State rules and court orders may differ.</p>
+<div class="tablewrap"><table>
+<tr><th>Duty</th><th>Key point</th></tr>
+<tr><td><strong>Competence</strong></td><td>Understand enough about the tool's capabilities and limitations to use it and review its output appropriately.</td></tr>
+<tr><td><strong>Confidentiality</strong></td><td>Before entering information relating to a client representation, evaluate the product's terms, security, retention, access, and training/use of inputs. Informed consent may be required depending on the circumstances, and generic boilerplate may not be enough for meaningful informed consent.</td></tr>
+<tr><td><strong>Verification &amp; candor</strong></td><td>Lawyers remain responsible for legal and factual assertions submitted to a tribunal. AI doesn't shift that responsibility.</td></tr>
+<tr><td><strong>Supervision</strong></td><td>Lawyers must appropriately supervise subordinate lawyers, nonlawyer staff, and technology-assisted work.</td></tr>
+<tr><td><strong>Communication</strong></td><td>Whether a client must be told about AI use depends on the circumstances, including whether it affects the means of representation or risks disclosure of client information.</td></tr>
+<tr><td><strong>Fees</strong></td><td>Lawyers may bill for actual legal work and review consistent with applicable rules. They generally may not bill a client for ordinary time spent learning a tool for their general practice.</td></tr>
+</table></div>
+<div class="callout"><strong>Safest default for class exercises:</strong> Use hypothetical or public facts unless an approved system and your course policy expressly permit otherwise.</div>
+<div data-ex="eth1"></div>
+<div data-ex="eth2"></div>
+<div data-ex="eth3"></div>
+<div data-ex="eth4"></div>
+`},
+{ id:'workshop', title:'Prompt workshop', html:`
+<h2>Prompt workshop</h2>
+<p class="lead">Put it together. Choose a research scenario and a target tool, write your prompt, and get feedback on its structure.</p>
+<div data-ex="workshop"></div>
+<div class="callout"><strong>Try this:</strong> Write prompts for the <em>same</em> scenario for two different tools, such as a one-sentence Westlaw query and an agent brief. Notice how the framework changes while the legal question stays the same.</div>
+`},
+{ id:'reference', title:'Quick reference & sources', html:`
+<h2>Quick-reference prompt templates</h2>
+<h4>General-purpose AI</h4>
+<div class="prompt" id="tpl1">Task: [what you want done]
+Context: [jurisdiction, facts, documents, audience, purpose]
+Constraints: [source limits, assumptions, confidentiality limits, what not to infer]
+Output: [table, search plan, memo outline, comparison, etc.]</div>
+<button class="btn sec" data-copy="tpl1">Copy</button>
+<h4>Generic legal research AI</h4>
+<div class="prompt" id="tpl2">In [jurisdiction/court], [one legal question]. Material facts/posture: [facts]. Limit the research to [source scope/date range]. Provide linked citations or source references for material propositions and identify any uncertainty, missing authority, or issue requiring further research.</div>
+<button class="btn sec" data-copy="tpl2">Copy</button>
+<h4>Agentic / deep research tool</h4>
+<div class="prompt" id="tpl3">Goal: [final research objective]
+Scope: [jurisdiction, sources, date range, documents, exclusions]
+Definition of done: [what the final answer must include]
+Checkpoint: [show plan / ask before changing scope / flag unresolved assumptions]
+Deliverable: [memo/table/report with citation requirements]</div>
+<button class="btn sec" data-copy="tpl3">Copy</button>
+<h4>Framework cheat sheet</h4>
+<div class="tablewrap"><table>
+<tr><th>Tool / situation</th><th>Pattern</th></tr>
+<tr><td>General-purpose AI</td><td>Task + Context + Constraints + Output</td></tr>
+<tr><td>Agents / deep research</td><td>Goal + Scope + Definition of Done + Checkpoints</td></tr>
+<tr><td>Legal research AI (generic)</td><td>Jurisdiction + Material Facts + One Legal Question + Source Scope + Verification</td></tr>
+<tr><td>Westlaw / CoCounsel</td><td>Intent + Context + Instruction; research prompts about 1–2 sentences</td></tr>
+<tr><td>Lexis+ AI Protégé</td><td>5 P's: Prime, Persona, Product, Prompt, Polish</td></tr>
+<tr><td>Bloomberg Law</td><td>Focused Question → Jurisdiction → Follow-up → Verify</td></tr>
+<tr><td>Harvey</td><td>Request + Context + Output (expanded: CLAIM)</td></tr>
+<tr><td>Legora</td><td>Source + Goal + Deliverable + Review Point; Tabular Review: one question per column</td></tr>
+</table></div>
+<h2 style="margin-top:2.5rem">Sources</h2>
+<p class="small">Links were checked for the source revision of September 28, 2026. Product behavior changes quickly, so prefer primary vendor help and official professional-responsibility sources.</p>
+<h4>General AI prompting</h4>
+<ul>
+<li>OpenAI, <a href="https://developers.openai.com/api/docs/guides/reasoning-best-practices" target="_blank" rel="noopener">Reasoning best practices</a></li>
+<li>OpenAI, <a href="https://developers.openai.com/api/docs/guides/prompt-engineering" target="_blank" rel="noopener">Prompt engineering</a></li>
+<li>Anthropic, <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-templates-and-variables" target="_blank" rel="noopener">Prompting best practices</a></li>
+<li>Google Cloud, <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/prompt-design-strategies" target="_blank" rel="noopener">Overview of prompting strategies</a></li>
+</ul>
+<h4>Legal AI products</h4>
+<ul>
+<li>Thomson Reuters, <a href="https://www.thomsonreuters.com/en-us/help/cocounsel/legal/skills/prompting.html" target="_blank" rel="noopener">Prompting CoCounsel</a></li>
+<li>Thomson Reuters, <a href="https://www.thomsonreuters.com/en-us/help/cocounsel/legal/skills/skills-prompts-workflows/westlaw-deep-research.html" target="_blank" rel="noopener">Westlaw Deep Research or AI-Assisted Research</a></li>
+<li>Thomson Reuters, <a href="https://legal.thomsonreuters.com/blog/writing-effective-legal-ai-prompts/" target="_blank" rel="noopener">Introduction to writing effective AI legal prompts</a></li>
+<li>LexisNexis, <a href="https://www.lexisnexis.com/documents/20250603062107_small.pdf" target="_blank" rel="noopener">Guide to Effective Prompting for Protégé</a></li>
+<li>Bloomberg Law, <a href="https://pro.bloomberglaw.com/about/our-approach-to-ai/" target="_blank" rel="noopener">Our Approach to AI</a></li>
+<li>Bloomberg Law, <a href="https://pro.bloomberglaw.com/insights/company-news/bloomberg-law-enhances-ai-assistant-capabilities-with-new-features/" target="_blank" rel="noopener">AI Assistant enhancements</a></li>
+<li>Harvey, <a href="https://help.harvey.ai/articles/prompt-writing-techniques" target="_blank" rel="noopener">Prompt Writing Techniques</a></li>
+<li>Harvey, <a href="https://www.harvey.ai/blog/ai-prompts-for-lawyers" target="_blank" rel="noopener">AI Prompting Best Practices for Lawyers</a></li>
+<li>Legora, <a href="https://legora.com/product/legal-research" target="_blank" rel="noopener">Legal Research</a>, <a href="https://legora.com/product/agent" target="_blank" rel="noopener">Agent</a>, <a href="https://legora.com/product/tabular-review" target="_blank" rel="noopener">Tabular Review</a></li>
+</ul>
+<h4>Verification and professional responsibility</h4>
+<ul>
+<li>ABA Standing Committee on Ethics and Professional Responsibility, <a href="https://www.americanbar.org/content/dam/aba/administrative/professional_responsibility/ethics-opinions/aba-formal-opinion-512.pdf" target="_blank" rel="noopener">Formal Opinion 512: Generative Artificial Intelligence Tools (July 29, 2024)</a></li>
+<li>Magesh, Surani, Dahl, Suzgun, Manning &amp; Ho, <a href="https://reglab.stanford.edu/publications/hallucination-free-assessing-the-reliability-of-leading-ai-legal-research-tools/" target="_blank" rel="noopener">Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools</a></li>
+<li>American Association of Law Libraries, <em>Best Practices for Using AI in Legal Research: A Guide for Non-Lawyers</em> (2026)</li>
+</ul>
+<div class="callout"><strong>Remember what stays constant:</strong> focused legal questions, jurisdiction and material facts, source-aware prompting, and independent verification. Product names, modes, limits, and interfaces will change.</div>
+`}
+];
+
+/* =========================================================
+   EXERCISES
+   ========================================================= */
+const STEPS = ['Open the source','Read the relevant language','Check authority','Update the law','Check context','Search for what is missing'];
+const EX = {
+loop:{type:'match', title:'Match the activity to the research stage', q:'Where in the six-stage research loop does each activity belong?',
+ choices:['1. Frame','2. Plan','3. Retrieve','4. Read','5. Update & synthesize','6. Communicate'],
+ items:[
+  {t:'Confirm that your research question is legally and factually accurate before searching.', a:'1. Frame', fb:'Framing comes first: jurisdiction, facts, posture, and the question itself.'},
+  {t:'Ask a general AI for terms of art and synonyms for "implied warranty of habitability."', a:'2. Plan', fb:'Generating terminology and search ideas is planning.'},
+  {t:'Run an AI-assisted search in a legal database to locate potentially relevant cases.', a:'3. Retrieve', fb:'Retrieval locates candidate authority. You still verify existence, relevance, and jurisdiction.'},
+  {t:'Check an AI summary’s account of a holding and its quotations against the opinion itself.', a:'4. Read', fb:'Reading the authority is where you confirm holding, reasoning, quotations, posture, and facts.'},
+  {t:'Run a citator and reconcile two lines of cases that appear to conflict.', a:'5. Update & synthesize', fb:'Updating and synthesis cover treatment, current validity, conflicts, and omitted authority.'},
+  {t:'Confirm every citation in the memo you send to your supervising attorney.', a:'6. Communicate', fb:'In the final work product, you are responsible for every material proposition and citation.'}
+ ]},
+tasks:{type:'match', title:'Identify the research task', q:'Which kind of research task does each scenario describe?',
+ choices:['Issue spotting','Research planning','Authority research','Source analysis','Synthesis','Drafting'],
+ items:[
+  {t:'You have an anonymized clinic fact pattern and want to know what claims or defenses might exist.', a:'Issue spotting', fb:'Identifying possible claims, defenses, and elements is issue spotting.'},
+  {t:'Before searching, you want synonyms and terms of art plus a sequence of sources to check.', a:'Research planning', fb:'Terminology, sources, and search sequence are research planning.'},
+  {t:'You need Ninth Circuit cases applying the "purposeful direction" test.', a:'Authority research', fb:'Locating cases, statutes, and regulations is authority research, best done in a legal database.'},
+  {t:'You pulled three opinions and want each holding extracted with pinpoint quotations.', a:'Source analysis', fb:'Summarizing or extracting from materials you provide is source analysis.'},
+  {t:'You want a chart reconciling two lines of appellate cases that seem to conflict.', a:'Synthesis', fb:'Organizing, distinguishing, and reconciling authorities is synthesis.'},
+  {t:'Your research is verified; you want an outline of the memo to your supervisor.', a:'Drafting', fb:'Turning verified research into work product is drafting.'}
+ ]},
+fwA:{type:'match', title:'Label Framework A components', q:'Label each part of the tenant prompt with its Framework A component.',
+ choices:['Task','Context','Constraints','Output'],
+ items:[
+  {t:'"Identify the legal issues and possible claims or defenses raised by these facts."', a:'Task', fb:'This says what the AI should do.'},
+  {t:'"A California residential tenant withheld rent after the landlord failed to repair a broken heater for six weeks."', a:'Context', fb:'Jurisdiction and material facts are context.'},
+  {t:'"Do not cite cases. I will locate authority in a legal database."', a:'Constraints', fb:'This sets a boundary. It stops the model from inventing authority and moves retrieval to a database.'},
+  {t:'"A table with columns Issue | What must be researched | Suggested search terms."', a:'Output', fb:'This specifies the form of the answer.'}
+ ]},
+fwB:{type:'match', title:'Label Framework B components', q:'Label each part of the personal-jurisdiction brief with its Framework B component.',
+ choices:['Goal','Scope','Definition of done','Checkpoint'],
+ items:[
+  {t:'"Prepare a research memo on whether an Oregon online retailer is subject to specific personal jurisdiction in Illinois federal court."', a:'Goal', fb:'The ultimate work product and legal question.'},
+  {t:'"U.S. Supreme Court and Seventh Circuit authority, plus N.D. Ill. decisions since 2021."', a:'Scope', fb:'Jurisdiction, court level, and date range define scope.'},
+  {t:'"State the governing test, identify the strongest authorities on both sides, and list unresolved questions."', a:'Definition of done', fb:'What a complete answer must contain.'},
+  {t:'"Before drafting the memo, show the research plan and identify any assumptions."', a:'Checkpoint', fb:'A pause point where you review the plan before the tool proceeds.'}
+ ]},
+fwChoice:{type:'mcq', title:'Choose the framework', q:'You want an AI agent to research a question across several jurisdictions and return a comparison memo. Which framework fits best?',
+ opts:[
+  {t:'Task + Context + Constraints + Output', ok:false, fb:'Framework A works for ordinary chat and document tasks. A long, autonomous, multi-source assignment needs a definition of done and checkpoints.'},
+  {t:'Goal + Scope + Definition of Done + Checkpoints', ok:true, fb:'Right. Multi-source, agentic work benefits from explicit scope, a definition of done, and a checkpoint where you review the plan.'},
+  {t:'A one-sentence natural-language question', ok:false, fb:'That\u2019s ideal for a focused database query like Westlaw AI-Assisted Research, but too thin for a multi-jurisdiction agent task.'}
+ ]},
+cot:{type:'mcq', title:'Reasoning instructions', q:'Which instruction is most useful to add to a prompt for a reasoning-capable model?',
+ opts:[
+  {t:'"Think step by step and show me all of your internal reasoning."', ok:false, fb:'Generally unnecessary for reasoning models, and it doesn\u2019t produce anything you can easily audit.'},
+  {t:'"State the rule, identify its source, apply it to the facts, give the strongest counterargument, and list unresolved issues."', ok:true, fb:'Right. This asks for a reviewable analysis structure (rule, source, application, counterargument, gaps) that you can check.'},
+  {t:'"Be as confident as possible."', ok:false, fb:'Confidence isn’t evidence. Ask for sources and explicit uncertainty instead.'}
+ ]},
+diag:{type:'multi', title:'Diagnose a weak prompt', q:'A student typed this into a legal research AI. Select every problem.',
+ pre:'<div class="prompt weak"><span class="tag weak">Weak</span>You are a brilliant senior partner with 30 years of experience. My client Jane Morrison, who loves dogs and lives in a blue house in Sacramento, got fired two days after she complained to the state labor commissioner about unpaid overtime. Tell me everything about employment law, whether she can sue, and how much she might recover.</div>',
+ opts:[
+  {t:'The governing jurisdiction isn’t stated clearly (it has to be inferred from "Sacramento").', ok:true, fb:'Say "Under California law" explicitly rather than making the tool infer it.'},
+  {t:'It includes facts that don’t matter legally (dogs, blue house).', ok:true, fb:'Irrelevant facts can skew retrieval.'},
+  {t:'It asks several questions at once (all of employment law, liability, damages).', ok:true, fb:'Ask one discrete issue at a time.'},
+  {t:'The long persona adds noise for a purpose-built legal tool.', ok:true, fb:'Legal research tools already know you want legal authority. The persona adds little.'},
+  {t:'It uses a client’s name that isn’t legally relevant, and it may raise confidentiality issues.', ok:true, fb:'Names can distort retrieval, and client information needs an approved system.'},
+  {t:'It doesn’t limit source scope or ask for citations and uncertainty.', ok:true, fb:'Add source scope (e.g., California Supreme Court and Courts of Appeal) and a verification request.'},
+  {t:'It’s too short and should use Boolean connectors.', ok:false, fb:'Not a problem. Legal AI tools generally want natural language, and length isn’t the issue here.'},
+  {t:'It should ask the AI to be more confident.', ok:false, fb:'Confidence isn’t a substitute for verification.'}
+ ]},
+rwLegal:{type:'rewrite', title:'Rewrite it', tool:'legal',
+ q:'Rewrite the Jane Morrison prompt for a legal research AI using Jurisdiction + Material Facts + One Legal Question + Source Scope + Verification. Pick one issue (for example, retaliation) and leave the others for separate prompts.',
+ model:'Under California law, may an employee state a retaliation claim against an employer that terminated her two days after she filed a wage complaint with the Labor Commissioner? Focus on California Supreme Court and Courts of Appeal authority and the current text of relevant Labor Code provisions (e.g., §§ 98.6 and 1102.5). Provide linked citations for each material proposition and flag any unresolved issue.'},
+toolFw:{type:'match', title:'Match the framework to the platform', q:'Which platform publishes or fits each prompting pattern?',
+ choices:['Westlaw / CoCounsel','Lexis+ AI Protégé','Bloomberg Law','Harvey','Legora'],
+ items:[
+  {t:'Intent + Context + Instruction', a:'Westlaw / CoCounsel', fb:'Thomson Reuters’ official framework.'},
+  {t:'Prime, Persona, Product, Prompt, Polish', a:'Lexis+ AI Protégé', fb:'The LexisNexis "5 P’s."'},
+  {t:'Focused Question → Jurisdiction → Follow-up → Verify', a:'Bloomberg Law', fb:'A product pattern (Bloomberg doesn’t publish a named acronym) that uses jurisdiction filters and follow-ups.'},
+  {t:'Request + Context + Output (expanded: CLAIM)', a:'Harvey', fb:'Harvey’s help-center pattern for routine prompts.'},
+  {t:'Source + Goal + Deliverable + Review Point', a:'Legora', fb:'A product pattern matched to Legora’s modes, including Tabular Review and Agent.'}
+ ]},
+toolFit:{type:'match', title:'Which tool or mode fits this prompt?', q:'Match each prompt to the tool or mode it was written for.',
+ choices:['Westlaw AI-Assisted / Deep Research','Legora Tabular Review column','Harvey document task','Agentic / deep-research brief','General-purpose AI brainstorm'],
+ items:[
+  {t:'"Under Texas law, does a party waive attorney-client privilege by disclosing privileged information to a transaction counterparty during due diligence when the parties have an NDA?"', a:'Westlaw AI-Assisted / Deep Research', fb:'One or two focused sentences, material facts only, natural language.'},
+  {t:'"Does this agreement contain a change-of-control provision? Answer Yes or No and quote the operative language."', a:'Legora Tabular Review column', fb:'One extractable question with a specified answer format, applied across documents.'},
+  {t:'"Request: Compare the assignment clauses in the three uploaded agreements. Context: We represent the buyer… Output: table…"', a:'Harvey document task', fb:'Request + Context + Output, grounded in uploaded documents.'},
+  {t:'"Goal: … Scope: … Definition of done: … Checkpoint: show me the research plan before drafting."', a:'Agentic / deep-research brief', fb:'Goal + Scope + Definition of Done + Checkpoints.'},
+  {t:'"Task: Generate synonyms and terms of art for constructive eviction. Constraints: do not cite cases. Output: a list grouped by concept."', a:'General-purpose AI brainstorm', fb:'Research planning with Framework A, with no reliance on citations.'}
+ ]},
+westlawBool:{type:'mcq', title:'Westlaw AI-Assisted Research', q:'Which prompt follows Thomson Reuters’ guidance for AI-Assisted Research?',
+ opts:[
+  {t:'privilege /s waiv! /p "due diligence" & NDA & Texas', ok:false, fb:'That’s Boolean terms-and-connectors syntax. It works in traditional search, but the AI tools want everyday language.'},
+  {t:'Under Texas law, does disclosing privileged information to a counterparty during due diligence under an NDA waive attorney-client privilege?', ok:true, fb:'Right: one focused sentence in plain language, with jurisdiction and only the material facts.'},
+  {t:'Acme Corp.’s GC Bob Rivera sent our privileged memos to Zenith LLC last March in Houston during the deal. Did Acme waive privilege, and can we claw them back, and should we sue Zenith?', ok:false, fb:'Irrelevant names can distort retrieval, and it bundles three questions into one prompt.'}
+ ]},
+protege:{type:'mcq', title:'Reading a Protégé response', q:'A Lexis+ AI Protégé answer includes a citation that is not linked. What does that signal?',
+ opts:[
+  {t:'The case is unpublished.', ok:false, fb:'Not what the cue means. See LexisNexis’s description.'},
+  {t:'The source could not be verified in the LexisNexis database. Treat it as unverified and locate it independently.', ok:true, fb:'Right. According to LexisNexis, an unlinked citation means the source couldn’t be verified in its database.'},
+  {t:'The case is so well known that it doesn’t need a link.', ok:false, fb:'No. Never assume an unlinked citation is reliable.'}
+ ]},
+harveyPages:{type:'mcq', title:'Harvey length instructions', q:'You want a fuller Harvey analysis. Which instruction follows Harvey’s tips?',
+ opts:[
+  {t:'"Write exactly five pages."', ok:false, fb:'Harvey recommends descriptive length words over fixed page counts.'},
+  {t:'"Provide a thorough analysis, organized by agreement, referring to section names."', ok:true, fb:'Right: descriptive length ("thorough") plus references to document sections rather than page numbers.'},
+  {t:'"See page 14 of the second PDF."', ok:false, fb:'Harvey suggests referring to document names or sections rather than page numbers when possible.'}
+ ]},
+bloombergAbstain:{type:'mcq', title:'When the tool abstains', q:'Bloomberg Law Answers declines to answer your question. What’s the best next step?',
+ opts:[
+  {t:'Rephrase repeatedly until it gives an answer.', ok:false, fb:'Pushing a grounded tool to answer anyway defeats the purpose of abstention.'},
+  {t:'Treat abstention as a signal: the platform may lack supporting content or the request may be outside legal scope. Narrow the question, check your jurisdiction filter, or research in other sources.', ok:true, fb:'Right. Bloomberg says the tools may abstain when supporting content is missing or the request is outside legal scope.'},
+  {t:'Assume there is no law on the issue.', ok:false, fb:'Abstention reflects the tool’s content and scope. It doesn’t tell you the state of the law.'}
+ ]},
+rwWestlaw:{type:'rewrite', title:'Rewrite for Westlaw AI-Assisted Research', tool:'westlaw',
+ pre:'<div class="prompt weak"><span class="tag weak">Weak</span>My client Bob Smith, CEO of Smith Widgets Inc., shared some privileged memos with the buyer’s lawyers during due diligence for a deal in Houston last spring even though there was an NDA. privilege AND waiv! /s "due diligence". Also what about work product, can we claw it back, and should we sue?</div>',
+ q:'Rewrite this as a focused 1–2 sentence research question in everyday language. Keep the material facts, drop the names and Boolean, and ask one question.',
+ model:'Under Texas law, does a party waive attorney-client privilege by disclosing privileged information to a transaction counterparty during due diligence when the parties have a nondisclosure agreement?'},
+genUses:{type:'multi', title:'Good uses of general-purpose AI', q:'Select every task where general-purpose AI is an appropriate research aid.',
+ opts:[
+  {t:'Brainstorming possible defenses and factual questions for a hypothetical', ok:true, fb:'A classic good use.'},
+  {t:'Generating synonyms and Boolean search ideas to use in Westlaw or Lexis', ok:true, fb:'Research planning is a strength.'},
+  {t:'Supplying the final citation for a brief without checking it', ok:false, fb:'Never. Citations from any AI must be opened, read, and updated.'},
+  {t:'Summarizing a contract you provide, with quotations', ok:true, fb:'Document-grounded tasks work well, especially with quotations you can check.'},
+  {t:'Confirming that a statute is the current version', ok:false, fb:'Check the current version in an authoritative source.'},
+  {t:'Identifying counterarguments to stress-test your analysis', ok:true, fb:'Useful. Then research whether those counterarguments are supported.'}
+ ]},
+genCite:{type:'mcq', title:'A confident citation', q:'A general-purpose AI gives you a case name, reporter citation, and a quotation that fits your argument perfectly. What should you do?',
+ opts:[
+  {t:'Cite it. The detail and specificity show it’s real.', ok:false, fb:'Specific-looking citations can be fabricated. Confidence and detail aren’t verification.'},
+  {t:'Open the case in an authoritative database, confirm the quotation and proposition, and run a citator before relying on it.', ok:true, fb:'Right: open the source, read the language, check authority, and update the law.'},
+  {t:'Ask the same AI whether the case is real.', ok:false, fb:'The model can’t verify itself reliably. Go to the source.'}
+ ]},
+rwDocs:{type:'rewrite', title:'Rewrite a document prompt', tool:'docs',
+ pre:'<div class="prompt weak"><span class="tag weak">Weak</span>Summarize these leases and tell me what they say about repairs.</div>',
+ q:'Rewrite this for a general AI working from three residential leases you will paste in. Identify the documents, define the categories, ask for quotations, and say what to do when a lease is silent.',
+ model:'Use only the three leases pasted below, labeled LEASE A, LEASE B, and LEASE C.\nFor each lease, identify: (1) who is responsible for heating repairs, (2) any notice the tenant must give, and (3) any deadline for the landlord to repair.\nOutput a table: Lease | Repair responsibility | Notice requirement | Repair deadline | Quotation with section number.\nIf a lease does not address an item, write "Not found" rather than inferring.\n\n[LEASE A]\n...\n[LEASE B]\n...\n[LEASE C]\n...'},
+failMatch:{type:'match', title:'Name the failure', q:'Which common failure does each weak prompt show?',
+ choices:['False premise','Too many issues at once','Irrelevant facts','Vague source request','Overreliance on confidence'],
+ items:[
+  {t:'"Why did the Ninth Circuit hold that the forum-selection clause was unenforceable?"', a:'False premise', fb:'It assumes the holding. Ask what the court held, and ask for the language.'},
+  {t:'"Research standing, preemption, class certification, and damages and tell me our odds."', a:'Too many issues at once', fb:'Break it into separate questions, or give an agent a scoped brief.'},
+  {t:'"My client, a vegan marathon runner who drives a red truck, slipped on ice outside a store in Denver."', a:'Irrelevant facts', fb:'Diet and truck color don’t affect the premises-liability analysis.'},
+  {t:'"Just give me the law on adverse possession."', a:'Vague source request', fb:'Specify jurisdiction, controlling vs. persuasive authority, and source types.'},
+  {t:'"The AI said ‘Confidence: 95%,’ so I didn’t pull the cases."', a:'Overreliance on confidence', fb:'A confidence label isn’t a citator.'}
+ ]},
+rwPremise:{type:'rewrite', title:'Fix the false premise', tool:'premise',
+ pre:'<div class="prompt weak"><span class="tag weak">Weak</span>Why did the court in the attached opinion hold that the arbitration clause was unconscionable?</div>',
+ q:'Rewrite this as a neutral question that doesn’t assume the holding and that asks for support from the opinion.',
+ model:'What did the court in the attached opinion hold about whether the arbitration clause was unconscionable? Quote or cite the portion of the opinion that states the holding. If the court did not decide that issue, say so.'},
+rwMany:{type:'rewrite', title:'Scope a sprawling request', tool:'agent',
+ pre:'<div class="prompt weak"><span class="tag weak">Weak</span>Research personal jurisdiction, venue, removal, statute of limitations, and damages and tell me whether we will win.</div>',
+ q:'Turn this into a scoped brief for an agentic research tool covering ONE of these issues. Use Goal + Scope + Definition of Done + Checkpoint.',
+ model:'Goal: Determine whether the defendant, a Delaware corporation headquartered in Texas, can remove our state-court breach-of-contract action filed in California Superior Court to federal court.\nScope: 28 U.S.C. §§ 1441 and 1446, U.S. Supreme Court and Ninth Circuit authority, and C.D. Cal. decisions from 2019 forward. Out of scope: personal jurisdiction, venue, limitations, and damages.\nDefinition of done: State the removal requirements and deadlines, apply them to the facts, identify the strongest authority on each side, and list unresolved factual questions.\nCheckpoint: Before drafting, show me your research plan and flag any assumptions about the amount in controversy or date of service.\nDeliverable: A concise memo with linked citations for every material proposition.'},
+stanford:{type:'mcq', title:'What does the Stanford study teach?', q:'What is the lasting lesson of the 2024 Stanford RegLab study?',
+ opts:[
+  {t:'Legal AI tools hallucinate exactly 17–33% of the time today.', ok:false, fb:'The study predates many current versions. Don’t treat those figures as current performance.'},
+  {t:'Retrieval grounding lowers the risk but doesn’t eliminate it, so verification is always required.', ok:true, fb:'Right. That’s the durable lesson.'},
+  {t:'Legal-specific AI tools never hallucinate because they use legal databases.', ok:false, fb:'The study found hallucinations in all the legal tools it tested.'}
+ ]},
+simResp:{type:'match', title:'Audit the simulated response', q:'For each statement, which verification step most directly addresses its main risk?',
+ choices:STEPS,
+ items:[
+  {t:'[A] Statutory text retrieved from an older database snapshot.', a:'Update the law', fb:'Statutes get amended; California amended § 16600 and added related sections effective 2024. Confirm the current version.'},
+  {t:'[B] An unpublished Court of Appeal opinion is presented as the governing rule.', a:'Check authority', fb:'Unpublished California opinions generally may not be cited or relied on (Cal. Rules of Court, rule 8.1115). Check the authority’s weight and status.'},
+  {t:'[C] An unlinked citation to a California Supreme Court case.', a:'Open the source', fb:'Unlinked means unverified. First confirm the case exists at all; it may be fabricated.'},
+  {t:'[D] A sweeping quotation ("every… per se invalid in all circumstances").', a:'Read the relevant language', fb:'Absolute language is a red flag. Confirm the quotation is accurate and actually supports the proposition.'},
+  {t:'[E] A preliminary-injunction ruling based on trade-secret misuse.', a:'Check context', fb:'Posture (preliminary injunction) and the trade-secret basis may make it inapposite to a pure non-solicitation question.'},
+  {t:'[F] "No California authority permits enforcement…"', a:'Search for what is missing', fb:'Claims that no contrary authority exists are exactly where AI omits adverse authority. Search for exceptions yourself.'}
+ ]},
+confidence:{type:'mcq', title:'"Confidence: High"', q:'What does the response’s "Confidence: High" label tell you?',
+ opts:[
+  {t:'The propositions have been cite-checked.', ok:false, fb:'A confidence label isn’t a citator.'},
+  {t:'Nothing that replaces verification. Rely on sources, not the label.', ok:true, fb:'Right. Prefer source-backed explanations, explicit uncertainty, and independent verification.'},
+  {t:'You can skip checking the linked items.', ok:false, fb:'Even linked authority must be read and updated.'}
+ ]},
+record:{type:'mcq', title:'The final step', q:'You’ve verified every proposition. What is the last step in the verification loop?',
+ opts:[
+  {t:'Delete the AI chat so the file stays clean.', ok:false, fb:'Not the step. What matters is keeping your own trail of verified sources.'},
+  {t:'Record the verified sources so your research trail survives even if the AI chat doesn’t.', ok:true, fb:'Right.'},
+  {t:'Ask the AI to rate its own accuracy.', ok:false, fb:'Self-ratings aren’t verification.'}
+ ]},
+eth1:{type:'mcq', title:'Scenario: summer associate', q:'As a summer associate, you want to paste a client’s confidential email into a free public chatbot to summarize it. What should you do?',
+ opts:[
+  {t:'Go ahead. Summaries are harmless.', ok:false, fb:'Entering client information into a system without evaluating its terms and security risks confidentiality.'},
+  {t:'Follow firm policy and use only approved tools. Confidentiality depends on the product’s terms, security, retention, access, and training use, and informed consent may be required.', ok:true, fb:'Right. This reflects ABA Formal Opinion 512’s confidentiality guidance and the rule to follow institutional policies.'},
+  {t:'Remove the client’s name and then paste freely into any tool.', ok:false, fb:'Removing a name doesn’t necessarily remove information relating to the representation. Follow policy and use approved systems.'}
+ ]},
+eth2:{type:'mcq', title:'Status of Opinion 512', q:'Which statement about ABA Formal Opinion 512 is accurate?',
+ opts:[
+  {t:'It is binding law in every state.', ok:false, fb:'It’s guidance interpreting the Model Rules.'},
+  {t:'It is guidance interpreting the ABA Model Rules. State rules and court orders may differ.', ok:true, fb:'Right.'},
+  {t:'It prohibits lawyers from using generative AI.', ok:false, fb:'It addresses how to use AI consistent with professional duties. It doesn’t ban it.'}
+ ]},
+eth3:{type:'mcq', title:'Billing', q:'A lawyer spends three hours learning a new AI tool for general use in their practice. Can they bill a client for that time?',
+ opts:[
+  {t:'Yes, it’s professional development.', ok:false, fb:'Generally not billable to a client under Opinion 512.'},
+  {t:'Generally no. Time spent learning a tool for general practice usually isn’t billable to a client.', ok:true, fb:'Right. Actual legal work and review can be billed consistent with the applicable rules.'},
+  {t:'Yes, if the tool saves the client money later.', ok:false, fb:'Future savings don’t make general learning time billable.'}
+ ]},
+eth4:{type:'mcq', title:'Candor', q:'An AI-generated brief you filed contains a nonexistent case. Who is responsible?',
+ opts:[
+  {t:'The AI vendor.', ok:false, fb:'AI doesn’t shift responsibility.'},
+  {t:'The lawyer who submitted it.', ok:true, fb:'Right. Lawyers remain responsible for the legal and factual assertions they submit to a tribunal.'},
+  {t:'No one, because it was an AI error.', ok:false, fb:'Verification and candor duties remain with the lawyer.'}
+ ]},
+workshop:{type:'workshop'}
+};
+
+/* =========================================================
+   PROMPT ANALYZER (heuristic, runs locally)
+   ========================================================= */
+const STATES='alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming|district of columbia|puerto rico';
+const RE={
+ jur:new RegExp('\\b('+STATES+')\\b|\\bfederal\\b|\\bcircuit\\b|supreme court|courts? of appeals?|district court|superior court|\\bu\\.?s\\.?c\\.?\\b|\\bu\\.s\\.|united states|\\bcal\\.|\\b[nsce]\\.d\\.|bankruptcy code|\\bucc\\b|\\bc\\.?f\\.?r\\.?\\b|under [a-z .]+ law|\\bstate law|ninth|seventh|second|fifth|eleventh|d\\.c\\.','i'),
+ scope:/binding|controlling|persuasive|published|primary (law|authorit|sources?)|secondary sources?|(since|from|after) (19|20)\d\d|(19|20)\d\d (forward|onward|to present)|date range|(last|past) \d+ years|supreme court|courts? of appeals?|circuit|statute|regulation|§|\bcode\b|uploaded|attached|only (use|rely|cite)|limit (the )?(research|answer|results|sources)|focus on|out of scope|exclude/i,
+ verify:/cit(e|es|ation|ations)\b|link|supporting authority|\bsources?\b|flag|uncertain|unresolved|\bgaps?\b|quot|pinpoint|not found/i,
+ output:/table|column|chart|memo|outline|\blist\b|bullet|summar|paragraph|\bbrief\b|concise|detailed|thorough|format|yes or no|return (the|a)|\bdraft\b|email|deliverable/i,
+ constraint:/do not|don't|\bonly\b|avoid|without|\blimit|not found|\blabel|distinguish|assum|rather than|instead of/i,
+ facts:/tenant|landlord|employee|employer|plaintiff|defendant|debtor|creditor|client|company|corporat|retailer|buyer|seller|agreement|contract|signed|withheld|filed|sued|terminat|fired|injur|sold|shipped|website|online|lease|clause|policy|disclos|nda|nondisclosure|\b\d+\b|weeks?|months?|years?|after|when/i,
+ task:/identify|compare|summari[sz]e|explain|\blist\b|draft|analy[sz]e|extract|\bfind\b|locate|determine|research|prepare|generate|brainstorm|outline|\bwhat\b|whether|\bdoes\b|\bis\b|\bare\b|\bmay\b|\bcan\b|\bhow\b|\bwhich\b/i,
+ bool:/\b(AND|OR|NOT)\b|\/s\b|\/p\b|\/\d+\b|\w!(\s|$)|\s&\s/,
+ persona:/you are (a|an|the) |act as|pretend|world[- ]class|brilliant|\bgenius\b|seasoned|30 years|20 years/i,
+ step:/step[- ]by[- ]step|show (me )?(all )?(of )?your (internal )?(reasoning|thinking|work)|chain[- ]of[- ]thought|think (carefully|hard)/i,
+ premise:/^\s*(why|how come) (did|does|was|is|were|has|do)\b/i,
+ client:/my client|our client|real client|actual client|confidential|privileged memo|\bssn\b|social security|\b\d{3}-\d{2}-\d{4}\b/i,
+ pages:/\b\d+\s*(-|to)?\s*\d*\s*pages?\b|\b(one|two|three|four|five|ten) pages?\b/i,
+ notfound:/not found|(does not|doesn't|do not|don't) (address|contain|say|answer|mention)|silent|say so|rather than infer|if (it|the \w+) (is|are) (not|missing)|not (addressed|found)/i,
+ quote:/quot|pinpoint|operative language|clause language|cite the (section|paragraph|portion)|section (number|reference)|with section/i,
+ docs:/uploaded|attached|document|agreement|lease|contract|provided|below|following|opinion|transcript|exhibit|pasted/i,
+ answerfmt:/yes or no|yes\/no|\breturn\b|answer (with|in|as)|number of|\bdate\b|in days|percentage|list each|format|quote/i,
+ goal:/goal|objective|prepare|determine|whether|research memo|\bi need|we need/i,
+ dod:/definition of done|must (include|contain|state|identify)|should (include|contain|state)|complete (answer|memo)|done when|the (memo|answer|report) (must|should)|state the|identify the strongest|list (any )?unresolved/i,
+ check:/checkpoint|before (drafting|proceeding|writing|you (draft|begin|start|proceed|write))|pause|show (me )?(the|your) (research )?plan|ask (me )?before|confirm with me|flag (any )?assumptions?|check in|review point/i,
+ intent:/because|so that|in order to|to (decide|advise|prepare|determine|evaluate|support|oppose|respond)|\bi need|\bwe need|for (a|an|my|our) (motion|memo|brief|client|hearing|opposition)|purpose|intent:/i,
+ lexPersona:/for (a|an|the|my|our) (client|partner|supervis|judge|court|senior|associate|non-?lawyer|layperson|general counsel)|audience|addressee|written for|explain (it |this )?to|perspective|we represent|i represent|persona:/i,
+ categories:/column|categor|for each|\|\s*\w|\(1\)|\b1[.)]\s|headings?|fields?:/i,
+ delim:/\[[A-Z]|"""|###|---|<\w+>|label(l)?ed|pasted below|document [A-Z1-9]\b|exhibit [A-Z1-9]\b|lease [A-C]\b/i,
+ holding:/what did|holding|hold about|what .* held|did the court (hold|decide|rule)|how did the court (rule|decide)/i
+};
+const ISSUES=['personal jurisdiction','venue','removal','statute of limitations','limitations','damages','class certification','summary judgment','discovery','standing','preemption','arbitration','sanctions','attorney fees','attorney\'s fees','injunction','work product','claw','should we sue','whether we will win','our odds'];
+const NAME_STOP=new Set(['New','York','Jersey','Mexico','Hampshire','North','South','West','Rhode','Island','Carolina','Dakota','Virginia','Supreme','Court','Circuit','United','States','District','Code','Business','Professions','Labor','Bankruptcy','Ninth','Seventh','Under','Superior','Appeal','Appeals','Federal','Rules','Civil','Procedure','Deep','Research','Westlaw','Lexis','Harvey','Legora','Bloomberg','Law','Goal','Scope','Task','Context','Output','Checkpoint','Definition','Request','Deliverable','Constraints','Not','Found','Commerce','Clause','Model','Practical','Commissioner','Protégé']);
+function words(t){return (t.trim().match(/\S+/g)||[]).length}
+function sentences(t){return t.split(/[.?!]+(\s|$)/).filter(s=>s&&s.trim().length>3).length}
+function qmarks(t){return (t.match(/\?/g)||[]).length}
+function issueCount(t){const l=t.toLowerCase();let n=0;const seen=new Set();ISSUES.forEach(i=>{if(l.includes(i)){const k=i.replace(/'s/,'');if(!seen.has(k)){seen.add(k);n++}}});return n}
+function hasNames(t){
+  if(/\b(Mr|Ms|Mrs|Dr)\.?\s+[A-Z]/.test(t)) return true;
+  if(/\b(my|our) client,?\s+[A-Z][a-z]+/.test(t)) return true;
+  const re=/\b([A-Z][a-z]+)\s+([A-Z][a-z]+)\b/g; let m;
+  while((m=re.exec(t))){ if(!NAME_STOP.has(m[1])&&!NAME_STOP.has(m[2])){ const before=t.slice(Math.max(0,m.index-2),m.index); if(!/[.?!:]\s$/.test(before)&&m.index!==0) return true; } }
+  if(/\b(Inc|LLC|Corp|Ltd)\b\.?/.test(t)) return true;
+  return false;
+}
+const CHECKS={
+ task:{label:'States a clear task or question',test:t=>RE.task.test(t),good:'You tell the tool what to do.',bad:'Lead with a clear verb or question: identify, compare, summarize, or "Under ___ law, does…?"'},
+ context:{label:'Supplies relevant context',test:t=>RE.facts.test(t)||RE.jur.test(t)||RE.docs.test(t),good:'You give the tool facts, documents, or purpose to work with.',bad:'Add the jurisdiction, key facts, documents, audience, or purpose.'},
+ constraints:{label:'Sets constraints or boundaries',test:t=>RE.constraint.test(t),good:'You set boundaries (e.g., "do not cite cases," "use only…").',bad:'Add boundaries: source limits, what not to infer, or "do not invent or cite cases."'},
+ output:{label:'Specifies the output format',test:t=>RE.output.test(t),good:'You say what form the answer should take.',bad:'Specify the output: a table (with columns), list, outline, memo, or search plan.'},
+ jurisdiction:{label:'Names the jurisdiction / court',test:t=>RE.jur.test(t),good:'Jurisdiction is explicit.',bad:'Name the governing jurisdiction and, if relevant, the court level (e.g., "Under California law," "Ninth Circuit").'},
+ facts:{label:'Includes material facts or posture',test:t=>RE.facts.test(t)&&words(t)>=12,good:'You include facts that shape the legal question.',bad:'Add only the facts that affect the legal question (relationship, key event, timing, posture).'},
+ oneq:{label:'Focuses on one legal question',test:t=>qmarks(t)<=1&&issueCount(t)<3,good:'One discrete issue.',bad:'You seem to ask more than one question. Split them into separate prompts or follow-ups.'},
+ scope:{label:'Defines the source scope',test:t=>RE.scope.test(t),good:'You limit the authority (courts, dates, statutes, or documents).',bad:'Add source scope: binding/controlling authority, specific courts, a date range, or a named statute.'},
+ verify:{label:'Asks for citations/links and flags uncertainty',test:t=>RE.verify.test(t),good:'You ask for support you can check.',bad:'Ask for linked citations for material propositions and for uncertainty or gaps to be flagged.'},
+ brief:{label:'Stays short (about 1–2 sentences)',test:t=>sentences(t)<=2&&words(t)<=60,good:'Concise, as Thomson Reuters recommends for AI research.',bad:'Trim to one or two sentences (roughly 60 words or fewer). Keep only material facts.'},
+ nobool:{kind:'caution',label:'Uses natural language, not Boolean',test:t=>!RE.bool.test(t),good:'Plain language.',bad:'Remove Boolean connectors (AND, /s, !). AI research tools want everyday language.'},
+ nonames:{kind:'caution',label:'Leaves out legally irrelevant names',test:t=>!hasNames(t),good:'No distracting proper names detected.',bad:'Proper names (people or companies) seem to be present. Drop them unless they’re legally relevant, because they can distort retrieval.'},
+ nopersona:{kind:'caution',label:'Skips persona / role-play noise',test:t=>!RE.persona.test(t),good:'No unnecessary persona.',bad:'Long personas ("You are a brilliant partner…") add noise in purpose-built legal tools. Cut them.'},
+ nopremise:{kind:'caution',label:'Avoids a built-in false premise',test:t=>!RE.premise.test(t),good:'The question doesn’t assume its answer.',bad:'"Why did…" assumes the answer. Ask "What did…" and request supporting language.'},
+ nostep:{kind:'caution',label:'Asks for a reviewable structure, not hidden reasoning',test:t=>!RE.step.test(t),good:'No "think step by step" instruction.',bad:'Instead of "think step by step," ask for rule, source, application, counterargument, and unresolved issues.'},
+ client:{kind:'caution',label:'Confidentiality check',test:t=>!RE.client.test(t),good:'No obvious client or confidential information.',bad:'This mentions a client or confidential material. For coursework, use hypothetical or public facts unless an approved system and course policy allow otherwise.'},
+ intent:{kind:'tip',label:'Explains why you need it (Intent)',test:t=>RE.intent.test(t),good:'You state your purpose.',bad:'Optional: a short statement of purpose (Intent) can help CoCounsel. Keep research queries concise.'},
+ persona:{kind:'tip',label:'Identifies perspective or audience (Persona)',test:t=>RE.lexPersona.test(t),good:'You set the perspective or audience.',bad:'Optional for Protégé: name the perspective or audience (e.g., "for a client memo," "we represent the debtor").'},
+ docs:{label:'Identifies the documents to use',test:t=>RE.docs.test(t),good:'You tell the tool which sources to use.',bad:'Say which documents to use (e.g., "the three leases pasted below").'},
+ quote:{label:'Asks for quotations or pinpoints',test:t=>RE.quote.test(t),good:'You can trace answers back to the text.',bad:'Ask for quotations or section/pinpoint references so you can check the answer.'},
+ notfound:{label:'Says what to do when the source is silent',test:t=>RE.notfound.test(t),good:'You tell it not to infer.',bad:'Add: "If the document does not address this, say ‘Not found’ rather than inferring."'},
+ categories:{label:'Defines categories or columns',test:t=>RE.categories.test(t),good:'Categories are defined before the table.',bad:'Define the categories or columns you want (e.g., "Lease | Responsibility | Notice | Deadline").'},
+ delim:{kind:'tip',label:'Separates instructions from source text',test:t=>RE.delim.test(t),good:'You use labels or delimiters.',bad:'Tip: label the source text (e.g., [LEASE A] …) so instructions and source stay separate.'},
+ answerfmt:{label:'Specifies the answer format',test:t=>RE.answerfmt.test(t),good:'The column has a defined answer format.',bad:'Specify the answer format (e.g., "Answer Yes or No," "Return the number of days").'},
+ onecol:{label:'Asks one extractable question',test:t=>qmarks(t)<=1&&words(t)<=60,good:'One question per column.',bad:'A column should ask one extractable question. Split this into separate columns.'},
+ nopages:{kind:'caution',label:'Uses length words, not page counts',test:t=>!RE.pages.test(t),good:'No fixed page count.',bad:'Harvey recommends "brief," "concise," "detailed," or "thorough" rather than page counts.'},
+ goal:{label:'States the Goal',test:t=>RE.goal.test(t),good:'The final objective is clear.',bad:'State the final research objective or work product you need.'},
+ gscope:{label:'Defines the Scope',test:t=>RE.scope.test(t)&&RE.jur.test(t),good:'Jurisdiction and sources are bounded.',bad:'Define scope: jurisdiction, court level, date range, sources, and what is out of scope.'},
+ dod:{label:'Includes a Definition of Done',test:t=>RE.dod.test(t),good:'You say what a complete answer contains.',bad:'Add a definition of done: what must the final answer include?'},
+ checkpoint:{label:'Builds in a Checkpoint',test:t=>RE.check.test(t),good:'The tool will pause for your review.',bad:'Add a checkpoint, such as "Before drafting, show me your research plan and flag assumptions."'},
+ deliverable:{label:'Specifies the Deliverable',test:t=>RE.output.test(t),good:'The deliverable is specified.',bad:'Name the deliverable (memo, table, report) and its citation requirements.'},
+ holding:{label:'Asks neutrally what the court held',test:t=>RE.holding.test(t),good:'Neutral question about the holding.',bad:'Ask "What did the court hold about…?" rather than presupposing the result.'},
+ jurtip:{kind:'tip',label:'Jurisdiction (or use the filter)',test:t=>RE.jur.test(t),good:'Jurisdiction is named.',bad:'Tip: in Bloomberg Law you can set jurisdiction with the filter instead of in the text. Just make sure it’s set.'},
+ brieftip:{kind:'tip',label:'Focused and concise',test:t=>sentences(t)<=2&&words(t)<=60,good:'Concise.',bad:'Tip: start focused, then narrow with follow-ups (dates, court, comparison).'}
+};
+const TOOLS={
+ general:{name:'General-purpose AI (ChatGPT, Claude, Gemini, Copilot)',fw:'Task + Context + Constraints + Output',checks:['task','context','constraints','output','nostep','nopremise','client'],
+  template:'Task: \nContext: \nConstraints: \nOutput: ',
+  model:'Task: Identify the legal issues and possible claims or defenses raised by these facts.\nContext: A California residential tenant withheld rent after the landlord failed to repair a broken heater for six weeks.\nConstraints: Do not cite cases. I will locate authority in a legal database. Flag any factual questions that could change the analysis.\nOutput: A table with columns Issue | What must be researched | Suggested search terms.'},
+ docs:{name:'General AI with documents you provide',fw:'Identify documents • define categories • ask for quotations • say what to do when silent',checks:['docs','task','categories','quote','notfound','delim','client'],
+  template:'Use only the documents pasted below, labeled [DOC A], [DOC B]...\nFor each document, identify: (1) ... (2) ...\nOutput a table: ... | ... | Quotation with section\nIf a document does not address an item, write "Not found" rather than inferring.\n\n[DOC A]\n...',
+  model:EX.rwDocs.model},
+ legal:{name:'Legal research AI (generic)',fw:'Jurisdiction + Material Facts + One Legal Question + Source Scope + Verification',checks:['jurisdiction','facts','oneq','scope','verify','nopersona','nopremise','nonames','client'],
+  template:'In [jurisdiction/court], [one legal question]? Material facts/posture: [facts]. Limit the research to [source scope/date range]. Provide linked citations for material propositions and identify any uncertainty or missing authority.',
+  model:'Under California law, may an employer enforce a customer non-solicitation clause against a former employee? The employee signed the agreement in 2023 and now works for a competitor. Focus on California Supreme Court and Courts of Appeal authority and the current text of Business and Professions Code § 16600. Provide linked citations to the authorities supporting each material proposition and flag any unresolved issue.'},
+ westlaw:{name:'Westlaw AI-Assisted / Deep Research (CoCounsel Legal)',fw:'Intent + Context + Instruction; keep research prompts to about 1–2 sentences in plain language',checks:['jurisdiction','facts','oneq','brief','nobool','nonames','nopersona','nopremise','intent'],
+  template:'Under [jurisdiction] law, [one focused question with only the material facts]?',
+  model:'Under Texas law, does a party waive attorney-client privilege by disclosing privileged information to a transaction counterparty during due diligence when the parties have a nondisclosure agreement?'},
+ lexis:{name:'Lexis+ AI with Protégé',fw:'5 P’s: Prime • Persona • Product • Prompt • Polish (follow up to refine)',checks:['jurisdiction','facts','task','oneq','output','verify','persona','nopremise'],
+  template:'Under [jurisdiction/body of law], [question]? [Key facts]. Focus on [court/authority]. [Product: summarize the rule / table / length] and provide linked supporting authority.',
+  model:'Under the Bankruptcy Code, are restitution claims dischargeable in a Chapter 11 case involving a corporate debtor? Focus on Ninth Circuit authority. Summarize the rule and provide linked supporting authority.'},
+ bloomberg:{name:'Bloomberg Law Answers / AI Assistant',fw:'Focused Question → Jurisdiction (filter) → Follow-up → Verify',checks:['task','oneq','jurtip','brieftip','nopersona','nopremise'],
+  template:'What [test/rule] does [court] apply to [focused issue]?',
+  model:'What test does the Ninth Circuit apply to determine whether an online platform has purposefully directed conduct at the forum state in a trademark case?\n\nFollow-up: Limit the answer to published Ninth Circuit decisions from 2020 forward and compare the cases by the online conduct the court found sufficient or insufficient.'},
+ harvey:{name:'Harvey',fw:'Request + Context + Output (expanded: CLAIM)',checks:['task','context','jurisdiction','output','nopages','notfound','client'],
+  template:'Request: \nContext: \nOutput: ',
+  model:'Request: Compare the assignment clauses in the three uploaded agreements.\nContext: We represent the buyer in a California asset acquisition and need to identify any consent requirements that could delay closing.\nOutput: Create a table with Agreement | Consent required? | Triggering language | Relevant quotation | Follow-up question. Enter "Not found" when the document does not address the issue.'},
+ legora:{name:'Legora Tabular Review (one column prompt)',fw:'One extractable question per column + answer format (+ quotation, + "Not found")',checks:['onecol','answerfmt','quote','notfound'],
+  template:'[One question about each document]? Answer [format] and quote the operative language. If not found, return "Not found."',
+  model:'What notice period applies to termination for convenience? Return the number of days and quote the clause. If not found, return "Not found."'},
+ agent:{name:'Agentic / deep research (CoCounsel multi-step, Legora Agent, etc.)',fw:'Goal + Scope + Definition of Done + Checkpoints (+ Deliverable)',checks:['goal','gscope','dod','checkpoint','deliverable','verify','client'],
+  template:'Goal: \nScope: \nDefinition of done: \nCheckpoint: \nDeliverable: ',
+  model:'Goal: Prepare a research memo on whether an Oregon online retailer is subject to specific personal jurisdiction in Illinois federal court.\nScope: U.S. Supreme Court and Seventh Circuit authority, plus N.D. Ill. decisions since 2021; focus on internet-sales contacts and relatedness.\nDefinition of done: State the governing test, identify the strongest authorities on both sides, and list unresolved factual or legal questions.\nCheckpoint: Before drafting the memo, show the research plan and identify any assumptions that could materially change the result.'},
+ premise:{name:'Neutral question about a holding',fw:'Ask what the court held + request supporting language',checks:['nopremise','holding','quote'],template:'',model:''}
+};
+function analyze(text,toolKey){
+  const tool=TOOLS[toolKey]; const t=text.trim();
+  const res=tool.checks.map(k=>{const c=CHECKS[k];return {k,c,pass:!!c.test(t)}});
+  const core=res.filter(r=>!r.c.kind); const corePass=core.filter(r=>r.pass).length;
+  const cautions=res.filter(r=>r.c.kind==='caution'&&!r.pass).length;
+  const ratio=core.length?corePass/core.length:1;
+  let cls,label;
+  if(ratio===1&&cautions===0){cls='good';label='Strong structure: all core elements present.'}
+  else if(ratio>=.6){cls='mid';label='Developing: '+corePass+' of '+core.length+' core elements present'+(cautions?', plus '+cautions+' thing'+(cautions>1?'s':'')+' to watch':'')+'.'}
+  else {cls='low';label='Needs work: '+corePass+' of '+core.length+' core elements present.'}
+  let html='<div class="rating '+cls+'">'+label+'</div><ul class="rub">';
+  res.forEach(r=>{
+    let ic,cl;
+    if(r.c.kind==='tip'){ic=r.pass?'✓':'ℹ';cl=r.pass?'ok':'tip'}
+    else if(r.c.kind==='caution'){ic=r.pass?'✓':'!';cl=r.pass?'ok':'w'}
+    else {ic=r.pass?'✓':'✗';cl=r.pass?'ok':'no'}
+    html+='<li><span class="ic '+cl+'">'+ic+'</span><span><strong>'+r.c.label+'.</strong> '+(r.pass?r.c.good:r.c.bad)+'</span></li>';
+  });
+  html+='</ul><p class="small">This feedback comes from automated pattern checks. It can miss good phrasing or be fooled by keywords, and it doesn’t judge legal accuracy. Compare your draft with the model and use your own judgment.</p>';
+  return html;
+}
+
+/* =========================================================
+   RENDERING
+   ========================================================= */
+const state={done:{},texts:{}};
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function markDone(id){ if(!state.done[id]){state.done[id]=true; const el=document.querySelector('[data-ex="'+id+'"]'); if(el) el.classList.add('is-done'); updateProgress();} }
+function head(ex,label){return '<div class="ex-h"><span>'+label+'</span><span class="done">✓ Completed</span></div>'+(ex.title?'<h4 style="margin:0 0 6px">'+ex.title+'</h4>':'')}
+
+function shuffledIdx(n,avoid){
+  // random permutation of 0..n-1 that differs from the original order;
+  // "avoid" adds a penalty so correct answers don't line up with their items
+  const base=[...Array(n).keys()]; let best=null,bestScore=1e9;
+  for(let tries=0;tries<60;tries++){
+    const a=base.slice();
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    let score=a.filter((v,i)=>v===i).length*2; if(avoid) score+=avoid(a);
+    if(n>1&&a.every((v,i)=>v===i)) score+=100;
+    if(score<bestScore){best=a;bestScore=score;} if(score===0) break;
+  }
+  return best;
+}
+function renderMCQ(el,id,ex){
+  el.innerHTML=head(ex,'Check your understanding')+'<p class="q">'+ex.q+'</p>'+ex.opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+esc(o.t)+'</button>').join('')+'<div class="fb"></div>';
+  const fb=$('.fb',el);
+  el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const o=ex.opts[+b.dataset.i];
+    el.querySelectorAll('.opt').forEach(x=>x.classList.remove('right','wrong'));
+    b.classList.add(o.ok?'right':'wrong');
+    fb.className='fb show '+(o.ok?'good':'bad');
+    fb.innerHTML=(o.ok?'<strong>Correct.</strong> ':'<strong>Not quite.</strong> ')+esc(o.fb)+(o.ok?'':' Try again.');
+    if(o.ok) markDone(id);
+  });
+}
+function renderMulti(el,id,ex){
+  el.innerHTML=head(ex,'Select all that apply')+(ex.pre||'')+'<p class="q">'+ex.q+'</p>'+ex.opts.map((o,i)=>{return '<label class="chk" data-i="'+i+'"><input type="checkbox"><span>'+esc(o.t)+'<div class="itemfb">'+esc(o.fb)+'</div></span></label>'}).join('')+'<div class="btns"><button class="btn chkbtn">Check answers</button></div><div class="fb"></div>';
+  $('.chkbtn',el).onclick=()=>{
+    let right=0;
+    el.classList.add('checked');
+    el.querySelectorAll('label.chk').forEach(l=>{
+      const o=ex.opts[+l.dataset.i]; const on=$('input',l).checked;
+      l.classList.remove('right','wrong');
+      const ok=(on===o.ok); if(ok) right++;
+      l.classList.add(ok?'right':'wrong');
+    });
+    const fb=$('.fb',el); const all=right===ex.opts.length;
+    fb.className='fb show '+(all?'good':'bad');
+    fb.innerHTML=all?'<strong>All correct.</strong> Read the notes under each option.':'<strong>'+right+' of '+ex.opts.length+' judged correctly.</strong> Red items were either missed or wrongly selected. Read the notes, adjust, and check again.';
+    if(all) markDone(id);
+  };
+}
+function renderMatch(el,id,ex){
+  const itemOrder=shuffledIdx(ex.items.length,a=>a.filter((it,pos)=>ex.choices[pos]===ex.items[it].a).length*3);
+  // questions are shuffled; the answer list stays in its original order
+  const opts='<option value="">Choose…</option>'+ex.choices.map(c=>'<option>'+esc(c)+'</option>').join('');
+  el.innerHTML=head(ex,'Match')+(ex.pre||'')+'<p class="q">'+ex.q+'</p>'+itemOrder.map(i=>'<div class="mrow" data-i="'+i+'"><div class="it">'+esc(ex.items[i].t)+'</div><select aria-label="Answer">'+opts+'</select><div class="itemfb"></div></div>').join('')+'<div class="btns"><button class="btn chkbtn">Check answers</button></div><div class="fb"></div>';
+  $('.chkbtn',el).onclick=()=>{
+    let right=0; el.classList.add('checked');
+    el.querySelectorAll('.mrow').forEach(r=>{
+      const it=ex.items[+r.dataset.i]; const v=$('select',r).value;
+      r.classList.remove('right','wrong');
+      const ok=v===it.a; if(ok) right++;
+      r.classList.add(ok?'right':'wrong');
+      $('.itemfb',r).innerHTML=ok?'✓ '+esc(it.fb):(v?'✗ Not this one. ':'✗ No answer selected. ')+'Hint: '+esc(it.fb);
+    });
+    const fb=$('.fb',el); const all=right===ex.items.length;
+    fb.className='fb show '+(all?'good':'bad');
+    fb.innerHTML=all?'<strong>All correct.</strong>':'<strong>'+right+' of '+ex.items.length+' correct.</strong> Use the hints and try again.';
+    if(all) markDone(id);
+  };
+}
+function renderRewrite(el,id,ex){
+  const tool=TOOLS[ex.tool];
+  el.innerHTML=head(ex,'Write & get feedback')+(ex.pre||'')+'<p class="q">'+ex.q+'</p>'+(tool.fw&&ex.tool!=='premise'?'<div class="fwhint"><strong>Target:</strong> '+esc(tool.name)+' • <strong>Framework:</strong> '+esc(tool.fw)+'</div>':'')+'<textarea placeholder="Write your prompt here…"></textarea><div class="btns"><button class="btn an">Get feedback</button><button class="btn sec md">Show model answer</button></div><div class="result"></div><div class="fb neutral mdl"><strong>One strong version</strong> (yours can differ and still be good):<div class="prompt better">'+esc(ex.model)+'</div></div>';
+  const ta=$('textarea',el);
+  ta.oninput=()=>{state.texts[id]={label:ex.title,q:ex.q,text:ta.value}};
+  $('.an',el).onclick=()=>{
+    const r=$('.result',el);
+    if(words(ta.value)<5){r.className='result show';r.innerHTML='<div class="rating low">Write a bit more first (at least a sentence) and then ask for feedback.</div>';return}
+    r.className='result show'; r.innerHTML=analyze(ta.value,ex.tool); markDone(id);
+  };
+  $('.md',el).onclick=()=>{$('.mdl',el).classList.toggle('show')};
+}
+const SCENARIOS=[
+ {k:'heat',t:'Tenant without heat (California)',d:'A California residential tenant withheld rent after the landlord failed to repair a broken heater for six weeks. The landlord then served a three-day notice to pay rent or quit. You need to know whether the tenant has a defense in an unlawful detainer action.'},
+ {k:'pj',t:'Online retailer (personal jurisdiction)',d:'An Oregon online retailer sold products through its website to Illinois customers. An Illinois buyer was injured by one of the products and sued in the Northern District of Illinois. You need to know whether the court has specific personal jurisdiction over the retailer.'},
+ {k:'assign',t:'Assignment clauses (asset acquisition)',d:'Your client is the buyer in a California asset acquisition. You have three uploaded supplier agreements and need to know whether any of them require consent to assignment that could delay closing.'},
+ {k:'nonsolicit',t:'Customer non-solicitation (California)',d:'An employee signed a customer non-solicitation agreement in 2023 and now works for a competitor in California. The former employer wants to enforce the clause.'},
+ {k:'own',t:'Your own hypothetical',d:'Write about any research question you choose. Use hypothetical or public facts only.'}
+];
+function renderWorkshop(el,id){
+  el.className='ex';
+  el.innerHTML=head({title:'Build a prompt'},'Workshop')+
+  '<div class="grid2"><label><span class="small">1. Scenario</span><br><select class="sc">'+SCENARIOS.map(s=>'<option value="'+s.k+'">'+esc(s.t)+'</option>').join('')+'</select></label>'+
+  '<label><span class="small">2. Target tool</span><br><select class="tl">'+Object.keys(TOOLS).filter(k=>k!=='premise').map(k=>'<option value="'+k+'">'+esc(TOOLS[k].name)+'</option>').join('')+'</select></label></div>'+
+  '<div class="card" style="margin:12px 0"><div class="scd"></div></div>'+
+  '<div class="fwhint fwh"></div>'+
+  '<p class="small">3. Write your prompt. Stuck? Insert the template and fill in the brackets.</p>'+
+  '<textarea placeholder="Write your prompt here…"></textarea>'+
+  '<div class="btns"><button class="btn an">Get feedback</button><button class="btn sec tp">Insert template</button><button class="btn sec md">Show model example for this tool</button><button class="btn sec cp">Copy my prompt</button></div>'+
+  '<div class="result"></div><div class="fb neutral mdl"></div>';
+  const sc=$('.sc',el), tl=$('.tl',el), ta=$('textarea',el);
+  const upd=()=>{
+    const s=SCENARIOS.find(x=>x.k===sc.value), t=TOOLS[tl.value];
+    $('.scd',el).innerHTML='<strong>Scenario:</strong> '+esc(s.d);
+    $('.fwh',el).innerHTML='<strong>Framework for this tool:</strong> '+esc(t.fw);
+    $('.mdl',el).innerHTML='<strong>Model example for '+esc(t.name)+'</strong> (it may use a different scenario; compare the <em>structure</em>):<div class="prompt better">'+esc(t.model)+'</div>';
+    $('.result',el).className='result';
+    save();
+  };
+  const save=()=>{ if(ta.value.trim()) state.texts['workshop:'+sc.value+':'+tl.value]={label:'Workshop – '+SCENARIOS.find(x=>x.k===sc.value).t+' – '+TOOLS[tl.value].name,q:SCENARIOS.find(x=>x.k===sc.value).d,text:ta.value}; };
+  sc.onchange=upd; tl.onchange=upd; ta.oninput=save;
+  // sensible pairings
+  $('.tp',el).onclick=()=>{
+    const put=()=>{ta.value=TOOLS[tl.value].template; ta.focus(); save();};
+    if(!ta.value.trim()){put();return}
+    let c=$('.inline-confirm',el); if(c){c.remove();return}
+    c=document.createElement('div'); c.className='inline-confirm';
+    c.innerHTML='Replace your current text with the template? <button class="btn" style="padding:4px 10px;margin-left:6px">Replace</button> <button class="btn sec" style="padding:4px 10px">Keep my text</button>';
+    const bs=c.querySelectorAll('button'); bs[0].onclick=()=>{put();c.remove()}; bs[1].onclick=()=>c.remove();
+    $('.btns',el).after(c);
+  };
+  $('.md',el).onclick=()=>$('.mdl',el).classList.toggle('show');
+  $('.cp',el).onclick=()=>copyText(ta.value,$('.cp',el));
+  $('.an',el).onclick=()=>{
+    const r=$('.result',el);
+    if(words(ta.value)<5){r.className='result show';r.innerHTML='<div class="rating low">Write a bit more first, then ask for feedback.</div>';return}
+    r.className='result show'; r.innerHTML=analyze(ta.value,tl.value); markDone(id); save();
+  };
+  upd();
+}
+function copyText(txt,btn){
+  const done=()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1400)};
+  try{ navigator.clipboard.writeText(txt).then(done,()=>fallback()); }catch(e){fallback()}
+  function fallback(){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();done()}
+}
+
+/* build */
+const nav=$('#nav'), main=$('#main');
+MODULES.forEach((m,i)=>{
+  const b=document.createElement('button'); b.dataset.i=i;
+  b.innerHTML='<span class="n">'+(i+1)+'</span><span class="t">'+m.title+'</span><span class="c" id="c-'+m.id+'"></span>';
+  b.onclick=()=>show(i); nav.appendChild(b);
+  const s=document.createElement('section'); s.className='mod'; s.id='m-'+m.id; s.innerHTML=m.html+
+   '<div class="pager">'+(i>0?'<button class="btn sec" data-go="'+(i-1)+'">← '+MODULES[i-1].title+'</button>':'<span></span>')+(i<MODULES.length-1?'<button class="btn" data-go="'+(i+1)+'">'+MODULES[i+1].title+' →</button>':'<span></span>')+'</div>';
+  main.appendChild(s);
+});
+document.querySelectorAll('[data-ex]').forEach(el=>{
+  const id=el.dataset.ex, ex=EX[id]; el.classList.add('ex');
+  if(ex.type==='mcq') renderMCQ(el,id,ex);
+  else if(ex.type==='multi') renderMulti(el,id,ex);
+  else if(ex.type==='match') renderMatch(el,id,ex);
+  else if(ex.type==='rewrite') renderRewrite(el,id,ex);
+  else if(ex.type==='workshop') renderWorkshop(el,id);
+});
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(+b.dataset.go));
+document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyText(document.getElementById(b.dataset.copy).textContent,b));
+document.querySelectorAll('#tooltabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#tooltabs button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('#m-tools .tabpanel').forEach(p=>p.classList.toggle('on',p.id===b.dataset.t));
+});
+function show(i){
+  document.querySelectorAll('section.mod').forEach((s,j)=>s.classList.toggle('show',j===i));
+  nav.querySelectorAll('button').forEach((b,j)=>b.classList.toggle('active',j===i));
+  const a=nav.querySelectorAll('button')[i]; if(a&&a.scrollIntoView&&window.innerWidth<860) a.scrollIntoView({inline:'center',block:'nearest'});
+  window.scrollTo(0,0);
+}
+function updateProgress(){
+  const all=Object.keys(EX); const d=all.filter(k=>state.done[k]).length;
+  $('#progtxt').textContent=d+' / '+all.length+' exercises';
+  $('#progbar').style.width=(100*d/all.length)+'%';
+  MODULES.forEach(m=>{
+    const ids=[...document.querySelectorAll('#m-'+m.id+' [data-ex]')].map(e=>e.dataset.ex);
+    const c=$('#c-'+m.id); if(!ids.length){c.textContent='';return}
+    const n=ids.filter(k=>state.done[k]).length; c.textContent=n===ids.length?'✓':n+'/'+ids.length;
+  });
+}
+$('#dlbtn').onclick=()=>{
+  const entries=Object.values(state.texts).filter(e=>e.text&&e.text.trim());
+  let out;
+  if(!entries.length){out='You haven’t written any prompts yet. Your writing exercises will appear here once you do.'}
+  else{
+    out='PROMPTING AI FOR LEGAL RESEARCH – MY WORK\n'+new Date().toLocaleString()+'\nExercises completed: '+Object.keys(state.done).length+' of '+Object.keys(EX).length+'\n\n';
+    entries.forEach(e=>{out+='==== '+e.label+' ====\nTask: '+e.q.replace(/<[^>]+>/g,'')+'\n\n'+e.text.trim()+'\n\n'});
+  }
+  $('#worktext').value=out; $('#workpanel').hidden=false; $('#workcopy').focus();
+};
+$('#workclose').onclick=()=>{$('#workpanel').hidden=true};
+$('#workpanel').onclick=e=>{if(e.target.id==='workpanel')$('#workpanel').hidden=true};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#workpanel').hidden=true});
+$('#workcopy').onclick=()=>{const t=$('#worktext');t.select();copyText(t.value,$('#workcopy'))};
+show(0); updateProgress();
+</script>
+
+</body></html>
